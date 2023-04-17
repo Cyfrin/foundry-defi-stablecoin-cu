@@ -316,7 +316,7 @@ contract DSCEngineTest is StdCheats, Test {
         depositedCollateralAndMintedDsc
     {
         uint256 expectedHealthFactor = 100 ether;
-        uint256 healthFactor = dsce.healthFactor(USER);
+        uint256 healthFactor = dsce.getHealthFactor(USER);
         // $100 minted with $20,000 collateral at 50% liquidation threshold
         // means that we must have $200 collatareral at all times.
         // 20,000 * 0.5 = 10,000
@@ -333,7 +333,7 @@ contract DSCEngineTest is StdCheats, Test {
 
         MockV3Aggregator(ethUsdPriceFeed).updateAnswer(ethUsdUpdatedPrice);
 
-        uint256 userHealthFactor = dsce.healthFactor(USER);
+        uint256 userHealthFactor = dsce.getHealthFactor(USER);
         // $180 collateral / 200 debt = 0.9
         assert(userHealthFactor == 0.9 ether);
     }
@@ -366,7 +366,7 @@ contract DSCEngineTest is StdCheats, Test {
         int256 ethUsdUpdatedPrice = 18e8; // 1 ETH = $18
 
         MockV3Aggregator(ethUsdPriceFeed).updateAnswer(ethUsdUpdatedPrice);
-        uint256 userHealthFactor = dsce.healthFactor(USER);
+        uint256 userHealthFactor = dsce.getHealthFactor(USER);
 
         ERC20Mock(weth).mint(liquidator, collateralToCover);
 

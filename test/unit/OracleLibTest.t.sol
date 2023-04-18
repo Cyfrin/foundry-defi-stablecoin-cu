@@ -18,10 +18,7 @@ contract DSCEngineTest is StdCheats, Test {
 
     function testGetTimeout() public {
         uint256 expectedTimeout = 3 hours;
-        assertEq(
-            OracleLib.getTimeout(AggregatorV3Interface(address(aggregator))),
-            expectedTimeout
-        );
+        assertEq(OracleLib.getTimeout(AggregatorV3Interface(address(aggregator))), expectedTimeout);
     }
 
     // // Foundry Bug - This reverts

@@ -19,12 +19,17 @@ contract DeployDSCWithBadAggregator is Script {
 
         MockV3Aggregator badAggregator = new MockV3Aggregator(8, 2000 ether);
 
-        (, address wbtcUsdPriceFeed, address weth, address wbtc) = helperConfig
-            .activeNetworkConfig();
+        (
+            ,
+            address wbtcUsdPriceFeed,
+            address weth,
+            address wbtc,
+            uint256 deployerKey
+        ) = helperConfig.activeNetworkConfig();
         tokenAddresses = [weth, wbtc];
         priceFeedAddresses = [address(badAggregator), wbtcUsdPriceFeed];
 
-        vm.startBroadcast();
+        vm.startBroadcast(deployerKey);
         DecentralizedStableCoin dsc = new DecentralizedStableCoin();
         DSCEngine dscEngine = new DSCEngine(
             tokenAddresses,

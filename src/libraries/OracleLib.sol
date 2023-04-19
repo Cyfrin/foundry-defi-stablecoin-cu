@@ -19,7 +19,7 @@ library OracleLib {
 
     function staleCheckLatestRoundData(
         AggregatorV3Interface chainlinkFeed
-    ) internal view returns (uint80, int256, uint256, uint256, uint80) {
+    ) public view returns (uint80, int256, uint256, uint256, uint80) {
         (
             uint80 roundId,
             int256 answer,

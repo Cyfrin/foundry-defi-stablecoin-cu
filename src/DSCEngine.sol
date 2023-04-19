@@ -148,6 +148,7 @@ contract DSCEngine is ReentrancyGuard {
         uint256 amountDscToMint
     ) external {
         depositCollateral(tokenCollateralAddress, amountCollateral);
+
         mintDsc(amountDscToMint);
     }
 
@@ -245,6 +246,7 @@ contract DSCEngine is ReentrancyGuard {
         _burnDsc(debtToCover, user, msg.sender);
 
         uint256 endingUserHealthFactor = _healthFactor(user);
+        // This conditional should never hit, but just in case
         if (endingUserHealthFactor <= startingUserHealthFactor) {
             revert DSCEngine__HealthFactorNotImproved();
         }
@@ -262,8 +264,10 @@ contract DSCEngine is ReentrancyGuard {
         uint256 amountDscToMint
     ) public moreThanZero(amountDscToMint) nonReentrant {
         s_userToDscMinted[msg.sender] += amountDscToMint;
+
         revertIfHealthFactorIsBroken(msg.sender);
         bool minted = i_dsc.mint(msg.sender, amountDscToMint);
+
         if (minted != true) {
             revert DSCEngine__MintFailed();
         }
@@ -330,6 +334,7 @@ contract DSCEngine is ReentrancyGuard {
             address(this),
             amountDscToBurn
         );
+        // This conditional is hypothetically unreachable
         if (!success) {
             revert DSCEngine__TransferFailed();
         }

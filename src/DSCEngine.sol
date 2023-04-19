@@ -75,12 +75,14 @@ contract DSCEngine is ReentrancyGuard {
     uint256 private constant ADDITIONAL_FEED_PRECISION = 1e10;
     uint256 private constant FEED_PRECISION = 1e8;
 
+    /// @dev Mapping of token address to price feed address
     mapping(address => address) private s_tokenAddressToPriceFeed;
-    // user -> token -> amount
+    /// @dev Amount of collateral deposited by user
     mapping(address => mapping(address => uint256))
         private s_userToTokenAddressToAmountDeposited;
-    // user -> amount
+    /// @dev Amount of DSC minted by user
     mapping(address => uint256) private s_userToDscMinted;
+    /// @dev If we know exactly how many tokens we have, we could make this immutable!
     address[] private s_collateralTokens;
 
     ///////////////////

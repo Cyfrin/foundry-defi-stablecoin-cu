@@ -46,9 +46,7 @@ contract MockMoreDebtDSC is ERC20Burnable, Ownable {
 
     address mockAggregator;
 
-    constructor(
-        address _mockAggregator
-    ) ERC20("DecentralizedStableCoin", "DSC") {
+    constructor(address _mockAggregator) ERC20("DecentralizedStableCoin", "DSC") {
         mockAggregator = _mockAggregator;
     }
 
@@ -65,10 +63,7 @@ contract MockMoreDebtDSC is ERC20Burnable, Ownable {
         super.burn(_amount);
     }
 
-    function mint(
-        address _to,
-        uint256 _amount
-    ) external onlyOwner returns (bool) {
+    function mint(address _to, uint256 _amount) external onlyOwner returns (bool) {
         if (_to == address(0)) {
             revert DecentralizedStableCoin__NotZeroAddress();
         }

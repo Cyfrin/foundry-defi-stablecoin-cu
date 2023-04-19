@@ -17,16 +17,13 @@ library OracleLib {
 
     uint256 private constant TIMEOUT = 3 hours;
 
-    function staleCheckLatestRoundData(
-        AggregatorV3Interface chainlinkFeed
-    ) public view returns (uint80, int256, uint256, uint256, uint80) {
-        (
-            uint80 roundId,
-            int256 answer,
-            uint256 startedAt,
-            uint256 updatedAt,
-            uint80 answeredInRound
-        ) = chainlinkFeed.latestRoundData();
+    function staleCheckLatestRoundData(AggregatorV3Interface chainlinkFeed)
+        public
+        view
+        returns (uint80, int256, uint256, uint256, uint80)
+    {
+        (uint80 roundId, int256 answer, uint256 startedAt, uint256 updatedAt, uint80 answeredInRound) =
+            chainlinkFeed.latestRoundData();
 
         if (updatedAt == 0 || answeredInRound < roundId) {
             revert OracleLib__StalePrice();
@@ -37,9 +34,7 @@ library OracleLib {
         return (roundId, answer, startedAt, updatedAt, answeredInRound);
     }
 
-    function getTimeout(
-        AggregatorV3Interface /* chainlinkFeed */
-    ) public pure returns (uint256) {
+    function getTimeout(AggregatorV3Interface /* chainlinkFeed */ ) public pure returns (uint256) {
         return TIMEOUT;
     }
 }

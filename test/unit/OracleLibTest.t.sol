@@ -9,6 +9,7 @@ import {OracleLib, AggregatorV3Interface} from "../../src/libraries/OracleLib.so
 
 contract DSCEngineTest is StdCheats, Test {
     using OracleLib for AggregatorV3Interface;
+
     MockV3Aggregator public aggregator;
     uint8 public constant DECIMALS = 8;
     int256 public constant INITAL_PRICE = 2000 ether;
@@ -19,10 +20,7 @@ contract DSCEngineTest is StdCheats, Test {
 
     function testGetTimeout() public {
         uint256 expectedTimeout = 3 hours;
-        assertEq(
-            OracleLib.getTimeout(AggregatorV3Interface(address(aggregator))),
-            expectedTimeout
-        );
+        assertEq(OracleLib.getTimeout(AggregatorV3Interface(address(aggregator))), expectedTimeout);
     }
 
     // Foundry Bug - I have to make staleCheckLatestRoundData public

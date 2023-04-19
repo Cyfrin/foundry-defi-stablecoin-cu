@@ -10,7 +10,25 @@ jobs:
     strategy:
       fail-fast: true
 
-    name: Foundry project
+    name: Forge Format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: nightly
+
+      - name: Run Forge build
+        run: |
+          forge --version
+          forge fmt --check
+        id: build
+
+    name: Forge Test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3

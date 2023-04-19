@@ -75,11 +75,13 @@ contract DSCEngine is ReentrancyGuard {
     uint256 private constant ADDITIONAL_FEED_PRECISION = 1e10;
     uint256 private constant FEED_PRECISION = 1e8;
 
+    /// @dev Mapping of token address to price feed address
     mapping(address => address) private s_tokenAddressToPriceFeed;
-    // user -> token -> amount
+    /// @dev Amount of collateral deposited by user
     mapping(address => mapping(address => uint256)) private s_userToTokenAddressToAmountDeposited;
-    // user -> amount
+    /// @dev Amount of DSC minted by user
     mapping(address => uint256) private s_userToDscMinted;
+    /// @dev If we know exactly how many tokens we have, we could make this immutable!
     address[] private s_collateralTokens;
 
     ///////////////////
@@ -136,6 +138,7 @@ contract DSCEngine is ReentrancyGuard {
         uint256 amountDscToMint
     ) external {
         depositCollateral(tokenCollateralAddress, amountCollateral);
+
         mintDsc(amountDscToMint);
     }
 
@@ -214,6 +217,7 @@ contract DSCEngine is ReentrancyGuard {
         _burnDsc(debtToCover, user, msg.sender);
 
         uint256 endingUserHealthFactor = _healthFactor(user);
+        // This conditional should never hit, but just in case
         if (endingUserHealthFactor <= startingUserHealthFactor) {
             revert DSCEngine__HealthFactorNotImproved();
         }
@@ -229,8 +233,10 @@ contract DSCEngine is ReentrancyGuard {
      */
     function mintDsc(uint256 amountDscToMint) public moreThanZero(amountDscToMint) nonReentrant {
         s_userToDscMinted[msg.sender] += amountDscToMint;
+
         revertIfHealthFactorIsBroken(msg.sender);
         bool minted = i_dsc.mint(msg.sender, amountDscToMint);
+
         if (minted != true) {
             revert DSCEngine__MintFailed();
         }
@@ -272,6 +278,7 @@ contract DSCEngine is ReentrancyGuard {
         s_userToDscMinted[onBehalfOf] -= amountDscToBurn;
 
         bool success = i_dsc.transferFrom(dscFrom, address(this), amountDscToBurn);
+        // This conditional is hypothetically unreachable
         if (!success) {
             revert DSCEngine__TransferFailed();
         }

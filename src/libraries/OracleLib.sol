@@ -18,7 +18,7 @@ library OracleLib {
     uint256 private constant TIMEOUT = 3 hours;
 
     function staleCheckLatestRoundData(AggregatorV3Interface chainlinkFeed)
-        internal
+        public
         view
         returns (uint80, int256, uint256, uint256, uint80)
     {

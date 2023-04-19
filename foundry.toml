@@ -12,9 +12,8 @@ sepolia = {key = "${ETHERSCAN_API_KEY}"}
 sepolia = "${SEPOLIA_RPC_URL}"
 
 [invariant]
-# runs = 10000
-runs = 1000
-depth = 25
+runs = 128
+depth = 128
 fail_on_revert = true
 
 

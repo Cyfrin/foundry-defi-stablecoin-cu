@@ -6,47 +6,39 @@ env:
   FOUNDRY_PROFILE: ci
 
 jobs:
-  check:
-    strategy:
-      fail-fast: true
 
-    name: Forge Format
+  format:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
         with:
           submodules: recursive
-
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
         with:
           version: nightly
-
       - name: Run Forge build
         run: |
           forge --version
           forge fmt --check
         id: build
-
-    name: Forge Test
+        
+  test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
         with:
           submodules: recursive
-
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
         with:
           version: nightly
-
       - name: Run Forge build
         run: |
           forge --version
-          forge build --sizes
+          forge build --force --sizes
         id: build
-
-      - name: Run Forge tests
+      - name: Run Forge tests and capture gas snapshots
         run: |
           forge test -vvv
-        id: test
+        id: gas-check

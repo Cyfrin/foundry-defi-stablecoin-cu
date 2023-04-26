@@ -9,13 +9,11 @@ import {ERC20Mock} from "@openzeppelin/contracts/mocks/ERC20Mock.sol";
 import {MockV3Aggregator} from "../../mocks/MockV3Aggregator.sol";
 import {DSCEngine, AggregatorV3Interface} from "../../../src/DSCEngine.sol";
 import {DecentralizedStableCoin} from "../../../src/DecentralizedStableCoin.sol";
-import {Randomish, EnumerableSet} from "../Randomish.sol";
 import {MockV3Aggregator} from "../../mocks/MockV3Aggregator.sol";
 import {console} from "forge-std/console.sol";
 
 contract StopOnRevertHandler is Test {
     using EnumerableSet for EnumerableSet.AddressSet;
-    using Randomish for EnumerableSet.AddressSet;
 
     // Deployed contracts to interact with
     DSCEngine public dscEngine;

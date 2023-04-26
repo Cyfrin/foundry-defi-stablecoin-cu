@@ -44,17 +44,13 @@ contract StopOnRevertInvariants is StdInvariant, Test {
     function setUp() external {
         DeployDSC deployer = new DeployDSC();
         (dsc, dsce, helperConfig) = deployer.run();
-        (ethUsdPriceFeed, btcUsdPriceFeed, weth, wbtc, ) = helperConfig
-            .activeNetworkConfig();
+        (ethUsdPriceFeed, btcUsdPriceFeed, weth, wbtc,) = helperConfig.activeNetworkConfig();
         handler = new StopOnRevertHandler(dsce, dsc);
         targetContract(address(handler));
         // targetContract(address(ethUsdPriceFeed)); Why can't we just do this?
     }
 
-    function invariant_protocolMustHaveMoreValueThatTotalSupplyDollars()
-        public
-        view
-    {
+    function invariant_protocolMustHaveMoreValueThatTotalSupplyDollars() public view {
         uint256 totalSupply = dsc.totalSupply();
         uint256 wethDeposted = ERC20Mock(weth).balanceOf(address(dsce));
         uint256 wbtcDeposited = ERC20Mock(wbtc).balanceOf(address(dsce));

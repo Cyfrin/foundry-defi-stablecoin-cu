@@ -124,10 +124,4 @@ contract StopOnRevertHandler is Test {
             return wbtc;
         }
     }
-
-    function callSummary() external view {
-        console.log("Weth total deposited", weth.balanceOf(address(dscEngine)));
-        console.log("Wbtc total deposited", wbtc.balanceOf(address(dscEngine)));
-        console.log("Total supply of DSC", dsc.totalSupply());
-    }
 }

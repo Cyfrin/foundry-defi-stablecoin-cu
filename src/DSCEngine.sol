@@ -87,7 +87,7 @@ contract DSCEngine is ReentrancyGuard {
     ///////////////////
     // Events
     ///////////////////
-    event CollateralDeposited(address indexed user, uint256 indexed amount);
+    event CollateralDeposited(address indexed user, address indexed token, uint256 indexed amount);
     event CollateralRedeemed(address indexed redeemedFrom, uint256 indexed amountCollateral, address from, address to); // if from != to, then it was liquidated
 
     ///////////////////
@@ -138,7 +138,6 @@ contract DSCEngine is ReentrancyGuard {
         uint256 amountDscToMint
     ) external {
         depositCollateral(tokenCollateralAddress, amountCollateral);
-
         mintDsc(amountDscToMint);
     }
 
@@ -146,7 +145,7 @@ contract DSCEngine is ReentrancyGuard {
      * @param tokenCollateralAddress: The ERC20 token address of the collateral you're depositing
      * @param amountCollateral: The amount of collateral you're depositing
      * @param amountDscToBurn: The amount of DSC you want to burn
-     * @notice This function will deposit your collateral and burn DSC in one transaction
+     * @notice This function will withdraw your collateral and burn DSC in one transaction
      */
     function redeemCollateralForDsc(address tokenCollateralAddress, uint256 amountCollateral, uint256 amountDscToBurn)
         external
@@ -252,7 +251,7 @@ contract DSCEngine is ReentrancyGuard {
         isAllowedToken(tokenCollateralAddress)
     {
         s_collateralDeposited[msg.sender][tokenCollateralAddress] += amountCollateral;
-        emit CollateralDeposited(msg.sender, amountCollateral);
+        emit CollateralDeposited(msg.sender, tokenCollateralAddress, amountCollateral);
         bool success = IERC20(tokenCollateralAddress).transferFrom(msg.sender, address(this), amountCollateral);
         if (!success) {
             revert DSCEngine__TransferFailed();

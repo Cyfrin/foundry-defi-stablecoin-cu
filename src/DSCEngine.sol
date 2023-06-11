@@ -35,7 +35,7 @@ import {DecentralizedStableCoin} from "./DecentralizedStableCoin.sol";
  *
  * The system is designed to be as minimal as possible, and have the tokens maintain a 1 token == $1 peg at all times.
  * This is a stablecoin with the properties:
- * - Exegenously Collateralized
+ * - Exogenously Collateralized
  * - Dollar Pegged
  * - Algorithmically Stable
  *

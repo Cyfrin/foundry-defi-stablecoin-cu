@@ -57,14 +57,33 @@ contract StopOnRevertHandler is Test {
 
     function redeemCollateral(uint256 collateralSeed, uint256 amountCollateral) public {
         ERC20Mock collateral = _getCollateralFromSeed(collateralSeed);
-        uint256 maxCollateral = dscEngine.getCollateralBalanceOfUser(address(collateral), msg.sender);
+        amountCollateral = bound(amountCollateral, 1, MAX_DEPOSIT_SIZE);
+        vm.startPrank(msg.sender);
+        collateral.mint(msg.sender, amountCollateral);
+        collateral.approve(address(engine), amountCollateral);
+        engine.depostCollateral(address(collateral), amountCollateral);
+
+        uint256 maxCollateral = engine.getCollateralBalanceOfUser(msg.sender, address(collateral)); 
+        console.log("maxCollateral", maxCollateral);
+
+        amountCollateral = bound(amountCollateral, 0, maxCollateral);
+        if (amountCollateral == 0) {
+            return;
+        }
+        engine.redeemCollateral(address(collateral), amountCollateral);
+        vm.stopPrank();
+    }
+
+   /* function redeemCollateral(uint256 collateralSeed, uint256 amountCollateral) public {
+        ERC20Mock collateral = _getCollateralFromSeed(collateralSeed);
+        uint256 maxCollateral = dscEngine.getCollateralBalanceOfUser(address(collateral), msg.sender);// argument are wrong that why this test never run
 
         amountCollateral = bound(amountCollateral, 0, maxCollateral);
         if (amountCollateral == 0) {
             return;
         }
         dscEngine.redeemCollateral(address(collateral), amountCollateral);
-    }
+    }*/
 
     function burnDsc(uint256 amountDsc) public {
         // Must burn more than 0

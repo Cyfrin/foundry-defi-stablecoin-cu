@@ -61,7 +61,7 @@ contract StopOnRevertHandler is Test {
         vm.startPrank(msg.sender);
         collateral.mint(msg.sender, amountCollateral);
         collateral.approve(address(dscEngine), amountCollateral);
-        dscEngine.depostCollateral(address(collateral), amountCollateral);
+        dscEngine.depositCollateral(address(collateral), amountCollateral);
 
         uint256 maxCollateral = dscEngine.getCollateralBalanceOfUser(msg.sender, address(collateral));
         console.log("maxCollateral", maxCollateral);

@@ -57,7 +57,7 @@ contract StopOnRevertHandler is Test {
 
     function redeemCollateral(uint256 collateralSeed, uint256 amountCollateral) public {
         ERC20Mock collateral = _getCollateralFromSeed(collateralSeed);
-        uint256 maxCollateral = dscEngine.getCollateralBalanceOfUser(address(collateral), msg.sender);
+        uint256 maxCollateral = dscEngine.getCollateralBalanceOfUser(msg.sender, address(collateral));
 
         amountCollateral = bound(amountCollateral, 0, maxCollateral);
         if (amountCollateral == 0) {

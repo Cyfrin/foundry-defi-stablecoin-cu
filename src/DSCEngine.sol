@@ -47,7 +47,7 @@ import {DecentralizedStableCoin} from "./DecentralizedStableCoin.sol";
  */
 contract DSCEngine is ReentrancyGuard {
     ///////////////////
-    // Erros
+    // Errors
     ///////////////////
     error DSCEngine__TokenAddressesAndPriceFeedAddressesAmountsDontMatch();
     error DSCEngine__NeedsMoreThanZero();

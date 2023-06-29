@@ -240,7 +240,7 @@ contract DSCEngineTest is StdCheats, Test {
         dsce.depositCollateral(weth, amountCollateral);
 
         uint256 expectedHealthFactor =
-            dsce.calculateHealthFactor(dsce.getUsdValue(weth, amountCollateral), amountToMint);
+            dsce.calculateHealthFactor(amountToMint, dsce.getUsdValue(weth, amountCollateral));
         vm.expectRevert(abi.encodeWithSelector(DSCEngine.DSCEngine__BreaksHealthFactor.selector, expectedHealthFactor));
         dsce.mintDsc(amountToMint);
         vm.stopPrank();

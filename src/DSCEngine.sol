@@ -27,7 +27,7 @@ pragma solidity 0.8.19;
 import {OracleLib, AggregatorV3Interface} from "./libraries/OracleLib.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {DecentralizedStableCoin} from "./DecentralizedStableCoin.sol";
+import {IDecentralizedStableCoin} from "./interface/IDecentralizedStableCoin.sol";
 
 /*
  * @title DSCEngine
@@ -66,7 +66,7 @@ contract DSCEngine is ReentrancyGuard {
     ///////////////////
     // State Variables
     ///////////////////
-    DecentralizedStableCoin private immutable i_dsc;
+    IDecentralizedStableCoin private immutable i_dsc;
 
     uint256 private constant LIQUIDATION_THRESHOLD = 50; // This means you need to be 200% over-collateralized
     uint256 private constant LIQUIDATION_BONUS = 10; // This means you get assets at a 10% discount when liquidating
@@ -120,7 +120,7 @@ contract DSCEngine is ReentrancyGuard {
             s_priceFeeds[tokenAddresses[i]] = priceFeedAddresses[i];
             s_collateralTokens.push(tokenAddresses[i]);
         }
-        i_dsc = DecentralizedStableCoin(dscAddress);
+        i_dsc = IDecentralizedStableCoin(dscAddress);
     }
 
     ///////////////////

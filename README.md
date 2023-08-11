@@ -2,6 +2,8 @@
 
 This is a section of the Cyfrin Foundry Solidity Course.
 
+*[⭐️ (0:00:00) | Lesson 12: Foundry DeFi Stablecoin](https://www.youtube.com/watch?v=wUjYK5gwNZs&t=0s)*
+
 [DSCEngine Example](https://sepolia.etherscan.io/address/0x091ea0838ebd5b7dda2f2a641b068d6d59639b98#code)
 [Decentralized Stablecoin Example](https://sepolia.etherscan.io/address/0xf30021646269007b0bdc0763fd736c6380602f2f#code)
 

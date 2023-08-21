@@ -552,6 +552,14 @@ contract DSCEngineTest is StdCheats, Test {
         assertEq(dscAddress, address(dsc));
     }
 
+    function testHealthFactorMustBeZeroIfUserHasNoDSCAndHasNotDepositedAnyCollateral() public {
+        vm.startPrank(user);
+        uint256 healthFactor = dsce.getHealthFactor(user);
+        vm.stopPrank();
+
+        assertEq(healthFactor, 0);
+    }
+
     // How do we adjust our invariant tests for this?
     // function testInvariantBreaks() public depositedCollateralAndMintedDsc {
     //     MockV3Aggregator(ethUsdPriceFeed).updateAnswer(0);

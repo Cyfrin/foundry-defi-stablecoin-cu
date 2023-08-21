@@ -85,6 +85,12 @@ contract StopOnRevertHandler is Test {
     function liquidate(uint256 collateralSeed, address userToBeLiquidated, uint256 debtToCover) public {
         uint256 minHealthFactor = dscEngine.getMinHealthFactor();
         uint256 userHealthFactor = dscEngine.getHealthFactor(userToBeLiquidated);
+
+        // Tried to liquidate user, Who wasn't Participating at all.
+        if (userHealthFactor <= 0) {
+            return;
+        }
+
         if (userHealthFactor >= minHealthFactor) {
             return;
         }

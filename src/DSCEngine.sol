@@ -64,6 +64,14 @@ contract DSCEngine is ReentrancyGuard {
     using OracleLib for AggregatorV3Interface;
 
     ///////////////////
+    // ENUMS
+    ///////////////////
+    enum Redeem {
+        NOT_REDEEMED,
+        REDEEMED
+    }
+
+    ///////////////////
     // State Variables
     ///////////////////
     DecentralizedStableCoin private immutable i_dsc;
@@ -75,6 +83,8 @@ contract DSCEngine is ReentrancyGuard {
     uint256 private constant ADDITIONAL_FEED_PRECISION = 1e10;
     uint256 private constant FEED_PRECISION = 1e8;
 
+    /// @dev Mapping of user to his/her Redeem Information
+    mapping(address user => Redeem userRedeemed) private s_userRedeem;
     /// @dev Mapping of token address to price feed address
     mapping(address collateralToken => address priceFeed) private s_priceFeeds;
     /// @dev Amount of collateral deposited by user
@@ -231,6 +241,7 @@ contract DSCEngine is ReentrancyGuard {
      * You can only mint DSC if you hav enough collateral
      */
     function mintDsc(uint256 amountDscToMint) public moreThanZero(amountDscToMint) nonReentrant {
+        s_userRedeem[msg.sender] = Redeem.NOT_REDEEMED;
         s_DSCMinted[msg.sender] += amountDscToMint;
         revertIfHealthFactorIsBroken(msg.sender);
         bool minted = i_dsc.mint(msg.sender, amountDscToMint);
@@ -250,6 +261,7 @@ contract DSCEngine is ReentrancyGuard {
         nonReentrant
         isAllowedToken(tokenCollateralAddress)
     {
+        s_userRedeem[msg.sender] = Redeem.NOT_REDEEMED;
         s_collateralDeposited[msg.sender][tokenCollateralAddress] += amountCollateral;
         emit CollateralDeposited(msg.sender, tokenCollateralAddress, amountCollateral);
         bool success = IERC20(tokenCollateralAddress).transferFrom(msg.sender, address(this), amountCollateral);
@@ -264,6 +276,7 @@ contract DSCEngine is ReentrancyGuard {
     function _redeemCollateral(address tokenCollateralAddress, uint256 amountCollateral, address from, address to)
         private
     {
+        s_userRedeem[from] = Redeem.REDEEMED;
         s_collateralDeposited[from][tokenCollateralAddress] -= amountCollateral;
         emit CollateralRedeemed(from, to, tokenCollateralAddress, amountCollateral);
         bool success = IERC20(tokenCollateralAddress).transfer(to, amountCollateral);
@@ -273,6 +286,7 @@ contract DSCEngine is ReentrancyGuard {
     }
 
     function _burnDsc(uint256 amountDscToBurn, address onBehalfOf, address dscFrom) private {
+        s_userRedeem[msg.sender] = Redeem.NOT_REDEEMED;
         s_DSCMinted[onBehalfOf] -= amountDscToBurn;
 
         bool success = i_dsc.transferFrom(dscFrom, address(this), amountDscToBurn);
@@ -298,6 +312,14 @@ contract DSCEngine is ReentrancyGuard {
 
     function _healthFactor(address user) private view returns (uint256) {
         (uint256 totalDscMinted, uint256 collateralValueInUsd) = _getAccountInformation(user);
+
+        // If you haven't redeemed any collateral and you have total collateral == 0, Then,
+        // It means that You're not Particiapting at all.
+        // As Infact, Your Health Factor Must be Zero.
+        if (s_userRedeem[user] == Redeem.NOT_REDEEMED && collateralValueInUsd <= 0) {
+            return 0;
+        }
+
         return _calculateHealthFactor(totalDscMinted, collateralValueInUsd);
     }
 

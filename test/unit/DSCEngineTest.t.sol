@@ -552,6 +552,12 @@ contract DSCEngineTest is StdCheats, Test {
         assertEq(dscAddress, address(dsc));
     }
 
+    function testLiquidationPrecision() public {
+        uint256 expectedLiquidationPrecision = 100;
+        uint256 actualLiquidationPrecision = dsce.getLiquidationPrecision();
+        assertEq(actualLiquidationPrecision, expectedLiquidationPrecision);
+    }
+
     // How do we adjust our invariant tests for this?
     // function testInvariantBreaks() public depositedCollateralAndMintedDsc {
     //     MockV3Aggregator(ethUsdPriceFeed).updateAnswer(0);

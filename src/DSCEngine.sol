@@ -318,7 +318,7 @@ contract DSCEngine is ReentrancyGuard {
     {
         if (totalDscMinted == 0) return type(uint256).max;
         uint256 collateralAdjustedForThreshold = (collateralValueInUsd * LIQUIDATION_THRESHOLD) / 100;
-        return (collateralAdjustedForThreshold * 1e18) / totalDscMinted;
+        return (collateralAdjustedForThreshold * PRECISION) / totalDscMinted;
     }
 
     function revertIfHealthFactorIsBroken(address user) internal view {

@@ -386,7 +386,7 @@ contract DSCEngineTest is StdCheats, Test {
         MockV3Aggregator(ethUsdPriceFeed).updateAnswer(ethUsdUpdatedPrice);
 
         uint256 userHealthFactor = dsce.getHealthFactor(user);
-        // $180 collateral / 200 debt = 0.9
+        // 180*50 (LIQUIDATION_THRESHOLD) / 100 (LIQUIDATION_PRECISION) / 100 (PRECISION) = 90 / 100 (totalDscMinted) = 0.9
         assert(userHealthFactor == 0.9 ether);
     }
 

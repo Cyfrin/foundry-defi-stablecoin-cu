@@ -381,7 +381,7 @@ contract DSCEngineTest is StdCheats, Test {
 
     function testHealthFactorCanGoBelowOne() public depositedCollateralAndMintedDsc {
         int256 ethUsdUpdatedPrice = 18e8; // 1 ETH = $18
-        // Rememeber, we need $150 at all times if we have $100 of debt
+        // Rememeber, we need $200 at all times if we have $100 of debt
 
         MockV3Aggregator(ethUsdPriceFeed).updateAnswer(ethUsdUpdatedPrice);
 

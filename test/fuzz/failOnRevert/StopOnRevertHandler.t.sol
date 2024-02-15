@@ -64,6 +64,7 @@ contract StopOnRevertHandler is Test {
         if (amountCollateral == 0) {
             return;
         }
+        vm.prank(msg.sender);
         dscEngine.redeemCollateral(address(collateral), amountCollateral);
     }
 

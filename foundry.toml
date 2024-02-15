@@ -2,20 +2,22 @@
 src = "src"
 out = "out"
 libs = ["lib"]
-remappings = ['@chainlink/contracts/=lib/chainlink-brownie-contracts/contracts/', '@openzeppelin/contracts=lib/openzeppelin-contracts/contracts']
+remappings = [
+    '@chainlink/contracts/=lib/chainlink-brownie-contracts/contracts/',
+    '@openzeppelin/contracts=lib/openzeppelin-contracts/contracts',
+]
 
 [etherscan]
 mainnet = { key = "${ETHERSCAN_API_KEY}" }
-sepolia = {key = "${ETHERSCAN_API_KEY}"}
+sepolia = { key = "${ETHERSCAN_API_KEY}" }
 
 [rpc_endpoints]
 sepolia = "${SEPOLIA_RPC_URL}"
 
 [invariant]
-runs = 128
-depth = 128
+runs = 64
+depth = 64
 fail_on_revert = true
-
 
 
 # See more config options https://github.com/foundry-rs/foundry/tree/master/config

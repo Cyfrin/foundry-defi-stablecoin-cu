@@ -60,6 +60,7 @@ contract StopOnRevertHandler is Test {
         uint256 maxCollateral = dscEngine.getCollateralBalanceOfUser(msg.sender, address(collateral));
 
         amountCollateral = bound(amountCollateral, 0, maxCollateral);
+        vm.prank(msg.sender);
         if (amountCollateral == 0) {
             return;
         }

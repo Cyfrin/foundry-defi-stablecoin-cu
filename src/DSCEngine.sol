@@ -41,7 +41,7 @@ import {DecentralizedStableCoin} from "./DecentralizedStableCoin.sol";
  *
  * It is similar to DAI if DAI had no governance, no fees, and was backed by only WETH and WBTC.
  *
- * Our DSC system should always be "overvollateralized". At no point, should the value of
+ * Our DSC system should always be "overcollateralized". At no point, should the value of
  * all collateral < the $ backed value of all the DSC.
  *
  * @notice This contract is the core of the Decentralized Stablecoin system. It handles all the logic

@@ -74,7 +74,10 @@ contract StopOnRevertHandler is Test {
         if (amountDsc == 0) {
             return;
         }
+        vm.startPrank(msg.sender);
+        dsc.approve(address(dscEngine), amountDsc);
         dscEngine.burnDsc(amountDsc);
+        vm.stopPrank();
     }
 
     // Only the DSCEngine can mint DSC!

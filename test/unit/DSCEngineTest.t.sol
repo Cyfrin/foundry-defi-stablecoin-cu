@@ -111,11 +111,7 @@ contract DSCEngineTest is StdCheats, Test {
         tokenAddresses = [address(mockDsc)];
         feedAddresses = [ethUsdPriceFeed];
         vm.prank(owner);
-        DSCEngine mockDsce = new DSCEngine(
-            tokenAddresses,
-            feedAddresses,
-            address(mockDsc)
-        );
+        DSCEngine mockDsce = new DSCEngine(tokenAddresses, feedAddresses, address(mockDsc));
         mockDsc.mint(user, amountCollateral);
 
         vm.prank(owner);
@@ -207,11 +203,7 @@ contract DSCEngineTest is StdCheats, Test {
         feedAddresses = [ethUsdPriceFeed];
         address owner = msg.sender;
         vm.prank(owner);
-        DSCEngine mockDsce = new DSCEngine(
-            tokenAddresses,
-            feedAddresses,
-            address(mockDsc)
-        );
+        DSCEngine mockDsce = new DSCEngine(tokenAddresses, feedAddresses, address(mockDsc));
         mockDsc.transferOwnership(address(mockDsce));
         // Arrange - User
         vm.startPrank(user);
@@ -231,7 +223,7 @@ contract DSCEngineTest is StdCheats, Test {
         vm.stopPrank();
     }
 
-    function testRevertsIfMintAmountBreaksHealthFactor() public depositedCollateral{
+    function testRevertsIfMintAmountBreaksHealthFactor() public depositedCollateral {
         // 0xe580cc6100000000000000000000000000000000000000000000000006f05b59d3b20000
         // 0xe580cc6100000000000000000000000000000000000000000000003635c9adc5dea00000
         (, int256 price,,,) = MockV3Aggregator(ethUsdPriceFeed).latestRoundData();
@@ -295,11 +287,7 @@ contract DSCEngineTest is StdCheats, Test {
         tokenAddresses = [address(mockDsc)];
         feedAddresses = [ethUsdPriceFeed];
         vm.prank(owner);
-        DSCEngine mockDsce = new DSCEngine(
-            tokenAddresses,
-            feedAddresses,
-            address(mockDsc)
-        );
+        DSCEngine mockDsce = new DSCEngine(tokenAddresses, feedAddresses, address(mockDsc));
         mockDsc.mint(user, amountCollateral);
 
         vm.prank(owner);
@@ -399,11 +387,7 @@ contract DSCEngineTest is StdCheats, Test {
         feedAddresses = [ethUsdPriceFeed];
         address owner = msg.sender;
         vm.prank(owner);
-        DSCEngine mockDsce = new DSCEngine(
-            tokenAddresses,
-            feedAddresses,
-            address(mockDsc)
-        );
+        DSCEngine mockDsce = new DSCEngine(tokenAddresses, feedAddresses, address(mockDsc));
         mockDsc.transferOwnership(address(mockDsce));
         // Arrange - User
         vm.startPrank(user);
@@ -486,9 +470,12 @@ contract DSCEngineTest is StdCheats, Test {
         assertEq(userCollateralValueInUsd, hardCodedExpectedValue);
     }
 
-    function testLiquidatorTakesOnUsersDebt() public liquidated {
-        (uint256 liquidatorDscMinted,) = dsce.getAccountInformation(liquidator);
-        assertEq(liquidatorDscMinted, amountToMint);
+    function test_LiquidatorHasNoDscAndNoDebtAfterLiquidation() public liquidated {
+        (uint256 liquidatorDscMinted,) = dscEngine.getAccountInformation(LIQUIDATOR);
+        uint256 liquidatorDscBalance = dsc.balanceOf(LIQUIDATOR);
+
+        assertEq(liquidatorDscMinted, 0);
+        assertEq(liquidatorDscBalance, 0);
     }
 
     function testUserHasNoMoreDebt() public liquidated {

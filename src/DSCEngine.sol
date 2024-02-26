@@ -281,6 +281,10 @@ contract DSCEngine is ReentrancyGuard {
     function _burnDsc(uint256 amountDscToBurn, address onBehalfOf, address dscFrom) private {
         s_DSCMinted[onBehalfOf] -= amountDscToBurn;
 
+        if (onBehalfOf != dscFrom) {
+            s_DSCMinted[dscFrom] -= amountDscToBurn;
+        }
+
         bool success = i_dsc.transferFrom(dscFrom, address(this), amountDscToBurn);
         // This conditional is hypothetically unreachable
         if (!success) {

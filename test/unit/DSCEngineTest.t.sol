@@ -2,21 +2,22 @@
 
 pragma solidity 0.8.19;
 
-import {DeployDSC} from "../../script/DeployDSC.s.sol";
-import {DSCEngine} from "../../src/DSCEngine.sol";
-import {DecentralizedStableCoin} from "../../src/DecentralizedStableCoin.sol";
-import {HelperConfig} from "../../script/HelperConfig.s.sol";
-import {ERC20Mock} from "@openzeppelin/contracts/mocks/ERC20Mock.sol";
-import {MockV3Aggregator} from "../mocks/MockV3Aggregator.sol";
-import {MockMoreDebtDSC} from "../mocks/MockMoreDebtDSC.sol";
-import {MockFailedMintDSC} from "../mocks/MockFailedMintDSC.sol";
-import {MockFailedTransferFrom} from "../mocks/MockFailedTransferFrom.sol";
-import {MockFailedTransfer} from "../mocks/MockFailedTransfer.sol";
-import {Test, console} from "forge-std/Test.sol";
-import {StdCheats} from "forge-std/StdCheats.sol";
+import { DeployDSC } from "../../script/DeployDSC.s.sol";
+import { DSCEngine } from "../../src/DSCEngine.sol";
+import { DecentralizedStableCoin } from "../../src/DecentralizedStableCoin.sol";
+import { HelperConfig } from "../../script/HelperConfig.s.sol";
+import { ERC20Mock } from "@openzeppelin/contracts/mocks/ERC20Mock.sol";
+import { MockV3Aggregator } from "../mocks/MockV3Aggregator.sol";
+import { MockMoreDebtDSC } from "../mocks/MockMoreDebtDSC.sol";
+import { MockFailedMintDSC } from "../mocks/MockFailedMintDSC.sol";
+import { MockFailedTransferFrom } from "../mocks/MockFailedTransferFrom.sol";
+import { MockFailedTransfer } from "../mocks/MockFailedTransfer.sol";
+import { Test, console } from "forge-std/Test.sol";
+import { StdCheats } from "forge-std/StdCheats.sol";
 
 contract DSCEngineTest is StdCheats, Test {
-    event CollateralRedeemed(address indexed redeemFrom, address indexed redeemTo, address token, uint256 amount); // if redeemFrom != redeemedTo, then it was liquidated
+    event CollateralRedeemed(address indexed redeemFrom, address indexed redeemTo, address token, uint256 amount); // if
+        // redeemFrom != redeemedTo, then it was liquidated
 
     DSCEngine public dsce;
     DecentralizedStableCoin public dsc;
@@ -44,7 +45,7 @@ contract DSCEngineTest is StdCheats, Test {
         DeployDSC deployer = new DeployDSC();
         (dsc, dsce, helperConfig) = deployer.run();
         (ethUsdPriceFeed, btcUsdPriceFeed, weth, wbtc, deployerKey) = helperConfig.activeNetworkConfig();
-        if (block.chainid == 31337) {
+        if (block.chainid == 31_337) {
             vm.deal(user, STARTING_USER_BALANCE);
         }
         // Should we put our integration tests here?
@@ -93,7 +94,7 @@ contract DSCEngineTest is StdCheats, Test {
     function testGetUsdValue() public {
         uint256 ethAmount = 15e18;
         // 15e18 ETH * $2000/ETH = $30,000e18
-        uint256 expectedUsd = 30000e18;
+        uint256 expectedUsd = 30_000e18;
         uint256 usdValue = dsce.getUsdValue(weth, ethAmount);
         assertEq(usdValue, expectedUsd);
     }
@@ -111,11 +112,7 @@ contract DSCEngineTest is StdCheats, Test {
         tokenAddresses = [address(mockDsc)];
         feedAddresses = [ethUsdPriceFeed];
         vm.prank(owner);
-        DSCEngine mockDsce = new DSCEngine(
-            tokenAddresses,
-            feedAddresses,
-            address(mockDsc)
-        );
+        DSCEngine mockDsce = new DSCEngine(tokenAddresses, feedAddresses, address(mockDsc));
         mockDsc.mint(user, amountCollateral);
 
         vm.prank(owner);
@@ -207,11 +204,7 @@ contract DSCEngineTest is StdCheats, Test {
         feedAddresses = [ethUsdPriceFeed];
         address owner = msg.sender;
         vm.prank(owner);
-        DSCEngine mockDsce = new DSCEngine(
-            tokenAddresses,
-            feedAddresses,
-            address(mockDsc)
-        );
+        DSCEngine mockDsce = new DSCEngine(tokenAddresses, feedAddresses, address(mockDsc));
         mockDsc.transferOwnership(address(mockDsce));
         // Arrange - User
         vm.startPrank(user);
@@ -231,7 +224,7 @@ contract DSCEngineTest is StdCheats, Test {
         vm.stopPrank();
     }
 
-    function testRevertsIfMintAmountBreaksHealthFactor() public depositedCollateral{
+    function testRevertsIfMintAmountBreaksHealthFactor() public depositedCollateral {
         // 0xe580cc6100000000000000000000000000000000000000000000000006f05b59d3b20000
         // 0xe580cc6100000000000000000000000000000000000000000000003635c9adc5dea00000
         (, int256 price,,,) = MockV3Aggregator(ethUsdPriceFeed).latestRoundData();
@@ -295,11 +288,7 @@ contract DSCEngineTest is StdCheats, Test {
         tokenAddresses = [address(mockDsc)];
         feedAddresses = [ethUsdPriceFeed];
         vm.prank(owner);
-        DSCEngine mockDsce = new DSCEngine(
-            tokenAddresses,
-            feedAddresses,
-            address(mockDsc)
-        );
+        DSCEngine mockDsce = new DSCEngine(tokenAddresses, feedAddresses, address(mockDsc));
         mockDsc.mint(user, amountCollateral);
 
         vm.prank(owner);
@@ -383,7 +372,8 @@ contract DSCEngineTest is StdCheats, Test {
         MockV3Aggregator(ethUsdPriceFeed).updateAnswer(ethUsdUpdatedPrice);
 
         uint256 userHealthFactor = dsce.getHealthFactor(user);
-        // 180*50 (LIQUIDATION_THRESHOLD) / 100 (LIQUIDATION_PRECISION) / 100 (PRECISION) = 90 / 100 (totalDscMinted) = 0.9
+        // 180*50 (LIQUIDATION_THRESHOLD) / 100 (LIQUIDATION_PRECISION) / 100 (PRECISION) = 90 / 100 (totalDscMinted) =
+        // 0.9
         assert(userHealthFactor == 0.9 ether);
     }
 
@@ -399,11 +389,7 @@ contract DSCEngineTest is StdCheats, Test {
         feedAddresses = [ethUsdPriceFeed];
         address owner = msg.sender;
         vm.prank(owner);
-        DSCEngine mockDsce = new DSCEngine(
-            tokenAddresses,
-            feedAddresses,
-            address(mockDsc)
-        );
+        DSCEngine mockDsce = new DSCEngine(tokenAddresses, feedAddresses, address(mockDsc));
         mockDsc.transferOwnership(address(mockDsce));
         // Arrange - User
         vm.startPrank(user);
@@ -467,7 +453,7 @@ contract DSCEngineTest is StdCheats, Test {
         uint256 liquidatorWethBalance = ERC20Mock(weth).balanceOf(liquidator);
         uint256 expectedWeth = dsce.getTokenAmountFromUsd(weth, amountToMint)
             + (dsce.getTokenAmountFromUsd(weth, amountToMint) / dsce.getLiquidationBonus());
-        uint256 hardCodedExpected = 6111111111111111110;
+        uint256 hardCodedExpected = 6_111_111_111_111_111_110;
         assertEq(liquidatorWethBalance, hardCodedExpected);
         assertEq(liquidatorWethBalance, expectedWeth);
     }
@@ -481,7 +467,7 @@ contract DSCEngineTest is StdCheats, Test {
         uint256 expectedUserCollateralValueInUsd = dsce.getUsdValue(weth, amountCollateral) - (usdAmountLiquidated);
 
         (, uint256 userCollateralValueInUsd) = dsce.getAccountInformation(user);
-        uint256 hardCodedExpectedValue = 70000000000000000020;
+        uint256 hardCodedExpectedValue = 70_000_000_000_000_000_020;
         assertEq(userCollateralValueInUsd, expectedUserCollateralValueInUsd);
         assertEq(userCollateralValueInUsd, hardCodedExpectedValue);
     }

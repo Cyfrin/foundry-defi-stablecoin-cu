@@ -13,7 +13,8 @@ import { DSCEngine } from "../../../src/DSCEngine.sol";
 import { DecentralizedStableCoin } from "../../../src/DecentralizedStableCoin.sol";
 import { HelperConfig } from "../../../script/HelperConfig.s.sol";
 import { DeployDSC } from "../../../script/DeployDSC.s.sol";
-import { ERC20Mock } from "@openzeppelin/contracts/mocks/ERC20Mock.sol";
+// import { ERC20Mock } from "@openzeppelin/contracts/mocks/ERC20Mock.sol"; Updated mock location
+import { ERC20Mock } from "../../mocks/ERC20Mock.sol";
 import { StopOnRevertHandler } from "./StopOnRevertHandler.t.sol";
 import { console } from "forge-std/console.sol";
 

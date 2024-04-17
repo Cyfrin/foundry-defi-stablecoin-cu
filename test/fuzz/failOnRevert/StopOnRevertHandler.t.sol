@@ -4,7 +4,8 @@ pragma solidity ^0.8.25;
 
 import { EnumerableSet } from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import { Test } from "forge-std/Test.sol";
-import { ERC20Mock } from "@openzeppelin/contracts/mocks/ERC20Mock.sol";
+// import { ERC20Mock } from "@openzeppelin/contracts/mocks/ERC20Mock.sol"; Updated mock location
+import { ERC20Mock } from "../../mocks/ERC20Mock.sol";
 
 import { MockV3Aggregator } from "../../mocks/MockV3Aggregator.sol";
 import { DSCEngine, AggregatorV3Interface } from "../../../src/DSCEngine.sol";

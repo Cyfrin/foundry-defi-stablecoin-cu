@@ -1,6 +1,4 @@
-// Commented out for now until revert on fail == false per function customization is implemented
-
-// // SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: MIT
 
 pragma solidity ^0.8.19;
 
@@ -15,7 +13,6 @@ import { DSCEngine } from "../../../src/DSCEngine.sol";
 import { DecentralizedStableCoin } from "../../../src/DecentralizedStableCoin.sol";
 import { HelperConfig } from "../../../script/HelperConfig.s.sol";
 import { DeployDSC } from "../../../script/DeployDSC.s.sol";
-// import { ERC20Mock } from "@openzeppelin/contracts/mocks/ERC20Mock.sol"; Updated mock location
 import { ERC20Mock } from "../../mocks/ERC20Mock.sol";
 import { ContinueOnRevertHandler } from "./ContinueOnRevertHandler.t.sol";
 import { console } from "forge-std/console.sol";

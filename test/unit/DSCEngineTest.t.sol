@@ -18,7 +18,7 @@ import { StdCheats } from "forge-std/StdCheats.sol";
 
 contract DSCEngineTest is StdCheats, Test {
     event CollateralRedeemed(address indexed redeemFrom, address indexed redeemTo, address token, uint256 amount); // if
-        // redeemFrom != redeemedTo, then it was liquidated
+    // redeemFrom != redeemedTo, then it was liquidated
 
     DSCEngine public dsce;
     DecentralizedStableCoin public dsc;
@@ -109,21 +109,18 @@ contract DSCEngineTest is StdCheats, Test {
         // Arrange - Setup
         address owner = msg.sender;
         vm.prank(owner);
-        MockFailedTransferFrom mockDsc = new MockFailedTransferFrom();
-        tokenAddresses = [address(mockDsc)];
+        MockFailedTransferFrom mockWethTransferFailed = new MockFailedTransferFrom();
+        tokenAddresses = [address(mockWethTransferFailed)];
         feedAddresses = [ethUsdPriceFeed];
         vm.prank(owner);
-        DSCEngine mockDsce = new DSCEngine(tokenAddresses, feedAddresses, address(mockDsc));
-        mockDsc.mint(user, amountCollateral);
-
-        vm.prank(owner);
-        mockDsc.transferOwnership(address(mockDsce));
+        DSCEngine mockDsce = new DSCEngine(tokenAddresses, feedAddresses, address(dsc));
+        mockWethTransferFailed.mint(user, amountCollateral);
         // Arrange - User
         vm.startPrank(user);
-        ERC20Mock(address(mockDsc)).approve(address(mockDsce), amountCollateral);
+        ERC20Mock(address(mockWethTransferFailed)).approve(address(mockDsce), amountCollateral);
         // Act / Assert
         vm.expectRevert(DSCEngine.DSCEngine__TransferFailed.selector);
-        mockDsce.depositCollateral(address(mockDsc), amountCollateral);
+        mockDsce.depositCollateral(address(mockWethTransferFailed), amountCollateral);
         vm.stopPrank();
     }
 
@@ -328,6 +325,7 @@ contract DSCEngineTest is StdCheats, Test {
         dsce.redeemCollateral(weth, amountCollateral);
         vm.stopPrank();
     }
+
     ///////////////////////////////////
     // redeemCollateralForDsc Tests //
     //////////////////////////////////

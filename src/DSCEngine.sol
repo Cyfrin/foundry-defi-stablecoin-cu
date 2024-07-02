@@ -115,7 +115,11 @@ contract DSCEngine is ReentrancyGuard {
     ///////////////////
     // Functions
     ///////////////////
-    constructor(address[] memory tokenAddresses, address[] memory priceFeedAddresses, address dscAddress) {
+    constructor(
+        address[] memory tokenAddresses,
+        address[] memory priceFeedAddresses,
+        address dscAddress
+    ) moreThanZero(tokenAddresses.length) {
         if (tokenAddresses.length != priceFeedAddresses.length) {
             revert DSCEngine__TokenAddressesAndPriceFeedAddressesAmountsDontMatch();
         }

@@ -27,6 +27,9 @@ This project is meant to be a stablecoin where users can deposit WETH and WBTC i
   - [Estimate gas](#estimate-gas)
 - [Formatting](#formatting)
 - [Slither](#slither)
+- [Additional Info:](#additional-info)
+  - [Let's talk about what "Official" means](#lets-talk-about-what-official-means)
+  - [Summary](#summary)
 - [Thank you!](#thank-you)
 
 # Getting Started
@@ -172,6 +175,23 @@ forge fmt
 ```
 slither :; slither . --config-file slither.config.json
 ```
+
+# Additional Info:
+Some users were having a confusion that whether Chainlink-brownie-contracts is an official Chainlink repository or not. Here is the info.
+Chainlink-brownie-contracts is an official repo. The repository is owned and maintained by the chainlink team for this very purpose, and gets releases from the proper chainlink release process. You can see it's still the `smartcontractkit` org as well.
+
+https://github.com/smartcontractkit/chainlink-brownie-contracts
+
+## Let's talk about what "Official" means
+The "official" release process is that chainlink deploys it's packages to [npm](https://www.npmjs.com/package/@chainlink/contracts). So technically, even downloading directly from `smartcontractkit/chainlink` is wrong, because it could be using unreleased code.
+
+So, then you have two options:
+
+1. Download from NPM and have your codebase have dependencies foreign to foundry
+2. Download from the chainlink-brownie-contracts repo which already downloads from npm and then packages it nicely for you to use in foundry.
+## Summary
+1. That is an official repo maintained by the same org
+2. It downloads from the official release cycle `chainlink/contracts` use (npm) and packages it nicely for digestion from foundry.
 
 # Thank you!
 

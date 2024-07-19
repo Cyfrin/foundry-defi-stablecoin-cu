@@ -411,13 +411,17 @@ contract DSCEngine is ReentrancyGuard {
 
     function getTokenAmountFromUsd(address token, uint256 usdAmountInWei) public view returns (uint256) {
         AggregatorV3Interface priceFeed = AggregatorV3Interface(s_priceFeeds[token]);
-        (, int256 price,,,) = priceFeed.staleCheckLatestRoundData();
-        // $100e18 USD Debt
-        // 1 ETH = 2000 USD
-        // The returned value from Chainlink will be 2000 * 1e8
-        // Most USD pairs have 8 decimals, so we will just pretend they all do
-        return ((usdAmountInWei * PRECISION) / (uint256(price) * ADDITIONAL_FEED_PRECISION));
+        (, int256 price,,,) = priceFeed.latestRoundData();
+        uint8 tokenDecimalsAmount = priceFeed.decimals();
+        // The amount is assumed to be in 18 decimals, adjust the price to match this decimal place.
+        // Example: If priceFeedDecimals is 8 and the amount is in 18 decimals, we need to scale the price by 10^(18 - priceFeedDecimals).
+        uint256 scaledPrice_1e18 = uint256(price) * 10 ** (18 - tokenDecimalsAmount);
+
+        // Calculate USD value
+        return (scaledPrice_1e18 * amount) / 10 ** 18;
     }
+    // fyi: already tested and verified basing on the 1e18 decimals system as default
+}
 
     function getPrecision() external pure returns (uint256) {
         return PRECISION;

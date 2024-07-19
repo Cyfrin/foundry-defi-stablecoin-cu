@@ -62,7 +62,7 @@ contract ContinueOnRevertInvariants is StdInvariant, Test {
         console.log("wethValue: %s", wethValue);
         console.log("wbtcValue: %s", wbtcValue);
 
-        assert(wethValue + wbtcValue >= totalSupply);
+        assert(wethValue + wbtcValue >= (totalSupply*2));
     }
 
     // function invariant_userCantCreateStabelcoinWithPoorHealthFactor() public {}

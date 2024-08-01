@@ -69,7 +69,6 @@ contract StopOnRevertInvariants is StdInvariant, Test {
         dsce.getAdditionalFeedPrecision();
         dsce.getCollateralTokens();
         dsce.getLiquidationBonus();
-        dsce.getLiquidationBonus();
         dsce.getLiquidationThreshold();
         dsce.getMinHealthFactor();
         dsce.getPrecision();

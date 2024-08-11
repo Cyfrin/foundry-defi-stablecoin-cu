@@ -108,22 +108,21 @@ contract DSCEngineTest is StdCheats, Test {
     function testRevertsIfTransferFromFails() public {
         // Arrange - Setup
         address owner = msg.sender;
-        vm.prank(owner);
-        MockFailedTransferFrom mockDsc = new MockFailedTransferFrom();
-        tokenAddresses = [address(mockDsc)];
+        vm.startPrank(owner);
+        MockFailedTransferFrom mockWeth = new MockFailedTransferFrom();
+        DecentralizedStableCoin mockDsc = new DecentralizedStableCoin();
+        tokenAddresses = [address(mockWeth)];
         feedAddresses = [ethUsdPriceFeed];
-        vm.prank(owner);
         DSCEngine mockDsce = new DSCEngine(tokenAddresses, feedAddresses, address(mockDsc));
-        mockDsc.mint(user, amountCollateral);
-
-        vm.prank(owner);
+        mockWeth.mint(user, amountCollateral);
         mockDsc.transferOwnership(address(mockDsce));
+        vm.stopPrank();
         // Arrange - User
         vm.startPrank(user);
-        ERC20Mock(address(mockDsc)).approve(address(mockDsce), amountCollateral);
+        mockWeth.approve(address(mockDsce), amountCollateral);
         // Act / Assert
         vm.expectRevert(DSCEngine.DSCEngine__TransferFailed.selector);
-        mockDsce.depositCollateral(address(mockDsc), amountCollateral);
+        mockDsce.depositCollateral(address(mockWeth), amountCollateral);
         vm.stopPrank();
     }
 
@@ -284,24 +283,22 @@ contract DSCEngineTest is StdCheats, Test {
     function testRevertsIfTransferFails() public {
         // Arrange - Setup
         address owner = msg.sender;
-        vm.prank(owner);
-        MockFailedTransfer mockDsc = new MockFailedTransfer();
-        tokenAddresses = [address(mockDsc)];
+        vm.startPrank(owner);
+        MockFailedTransfer mockWeth = new MockFailedTransfer();
+        DecentralizedStableCoin mockDsc = new DecentralizedStableCoin();
+        tokenAddresses = [address(mockWeth)];
         feedAddresses = [ethUsdPriceFeed];
-        vm.prank(owner);
         DSCEngine mockDsce = new DSCEngine(tokenAddresses, feedAddresses, address(mockDsc));
-        mockDsc.mint(user, amountCollateral);
-
-        vm.prank(owner);
+        mockWeth.mint(user, amountCollateral);
         mockDsc.transferOwnership(address(mockDsce));
+        vm.stopPrank();
         // Arrange - User
         vm.startPrank(user);
-        ERC20Mock(address(mockDsc)).approve(address(mockDsce), amountCollateral);
+        ERC20Mock(address(mockWeth)).approve(address(mockDsce), amountCollateral);
         // Act / Assert
-        mockDsce.depositCollateral(address(mockDsc), amountCollateral);
+        mockDsce.depositCollateral(address(mockWeth), amountCollateral);
         vm.expectRevert(DSCEngine.DSCEngine__TransferFailed.selector);
-        mockDsce.redeemCollateral(address(mockDsc), amountCollateral);
-        vm.stopPrank();
+        mockDsce.redeemCollateral(address(mockWeth), amountCollateral);
     }
 
     function testRevertsIfRedeemAmountIsZero() public {

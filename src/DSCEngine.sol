@@ -198,7 +198,7 @@ contract DSCEngine is ReentrancyGuard {
     }
 
     /*
-    * @param collateral: The ERC20 token address of the collateral you're using to make the protocol solvent again.
+     * @param collateral: The ERC20 token address of the collateral you're using to make the protocol solvent again.
      * This is collateral that you're going to take from the user who is insolvent.
      * In return, you have to burn your DSC to pay off their debt, but you don't pay off your own.
      * @param user: The user who is insolvent. They have to have a _healthFactor below MIN_HEALTH_FACTOR

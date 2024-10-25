@@ -149,8 +149,8 @@ contract DSCEngine is ReentrancyGuard {
     }
 
     /*
-     * @param tokenCollateralAddress: The ERC20 token address of the collateral you're depositing
-     * @param amountCollateral: The amount of collateral you're depositing
+     * @param tokenCollateralAddress: The ERC20 token address of the collateral you're withdrawing
+     * @param amountCollateral: The amount of collateral you're withdrawing
      * @param amountDscToBurn: The amount of DSC you want to burn
      * @notice This function will withdraw your collateral and burn DSC in one transaction
      */
@@ -190,7 +190,7 @@ contract DSCEngine is ReentrancyGuard {
     /*
      * @notice careful! You'll burn your DSC here! Make sure you want to do this...
      * @dev you might want to use this if you're nervous you might get liquidated and want to just burn
-     * you DSC but keep your collateral in.
+     * your DSC but keep your collateral in.
      */
     function burnDsc(uint256 amount) external moreThanZero(amount) {
         _burnDsc(amount, msg.sender, msg.sender);
@@ -250,7 +250,7 @@ contract DSCEngine is ReentrancyGuard {
     ///////////////////
     /*
      * @param amountDscToMint: The amount of DSC you want to mint
-     * You can only mint DSC if you hav enough collateral
+     * You can only mint DSC if you have enough collateral
      */
     function mintDsc(uint256 amountDscToMint) public moreThanZero(amountDscToMint) nonReentrant {
         s_DSCMinted[msg.sender] += amountDscToMint;

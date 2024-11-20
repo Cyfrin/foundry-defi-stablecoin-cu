@@ -218,6 +218,7 @@ contract DSCEngine is ReentrancyGuard {
         uint256 debtToCover
     )
         external
+        isAllowedToken(collateral)
         moreThanZero(debtToCover)
         nonReentrant
     {

@@ -34,7 +34,7 @@ contract MockFailedMintDSC is ERC20Burnable, Ownable {
         if (_to == address(0)) {
             revert DecentralizedStableCoin__NotZeroAddress();
         }
-        if (_amount <= 0) {
+        if (_amount == 0) {
             revert DecentralizedStableCoin__AmountMustBeMoreThanZero();
         }
         _mint(_to, _amount);

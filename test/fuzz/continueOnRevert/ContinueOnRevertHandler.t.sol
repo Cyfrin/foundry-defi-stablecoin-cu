@@ -44,7 +44,7 @@ contract ContinueOnRevertHandler is Test {
         btcUsdPriceFeed = MockV3Aggregator(dscEngine.getCollateralTokenPriceFeed(address(wbtc)));
     }
 
-    // FUNCTOINS TO INTERACT WITH
+    // FUNCTIONS TO INTERACT WITH
 
     ///////////////
     // DSCEngine //

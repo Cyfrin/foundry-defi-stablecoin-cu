@@ -13,11 +13,13 @@ jobs:
         - name: Install aderyn
           run: |
             curl -L https://raw.githubusercontent.com/Cyfrin/aderyn/dev/cyfrinup/install | bash
-            source ~/.bashrc
+            export PATH="/home/runner/.cyfrin/bin:$PATH"
             cyfrinup
 
         - name: Run aderyn
-          run: aderyn . -o ci-report.json
+          run: |
+            export PATH="/home/runner/.cyfrin/bin:$PATH"
+            aderyn . -o ci-report.json
         
         - name: Check report
           run: |

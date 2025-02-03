@@ -13,6 +13,7 @@ jobs:
         - name: Install aderyn
           run: |
             curl -L https://raw.githubusercontent.com/Cyfrin/aderyn/dev/cyfrinup/install | bash
+            source ~/.bashrc
             cyfrinup
 
         - name: Run aderyn

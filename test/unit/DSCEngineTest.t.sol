@@ -453,7 +453,7 @@ contract DSCEngineTest is StdCheats, Test {
     function testLiquidationPayoutIsCorrect() public liquidated {
         uint256 liquidatorWethBalance = ERC20Mock(weth).balanceOf(liquidator);
         uint256 expectedWeth = dsce.getTokenAmountFromUsd(weth, amountToMint)
-            + (dsce.getTokenAmountFromUsd(weth, amountToMint) / dsce.getLiquidationBonus());
+            + (dsce.getTokenAmountFromUsd(weth, amountToMint) * dsce.getLiquidationBonus() / dsce.getLiquidationPrecision());
         uint256 hardCodedExpected = 6_111_111_111_111_111_110;
         assertEq(liquidatorWethBalance, hardCodedExpected);
         assertEq(liquidatorWethBalance, expectedWeth);
@@ -462,7 +462,7 @@ contract DSCEngineTest is StdCheats, Test {
     function testUserStillHasSomeEthAfterLiquidation() public liquidated {
         // Get how much WETH the user lost
         uint256 amountLiquidated = dsce.getTokenAmountFromUsd(weth, amountToMint)
-            + (dsce.getTokenAmountFromUsd(weth, amountToMint) / dsce.getLiquidationBonus());
+            + (dsce.getTokenAmountFromUsd(weth, amountToMint) * dsce.getLiquidationBonus() / dsce.getLiquidationPrecision());
 
         uint256 usdAmountLiquidated = dsce.getUsdValue(weth, amountLiquidated);
         uint256 expectedUserCollateralValueInUsd = dsce.getUsdValue(weth, amountCollateral) - (usdAmountLiquidated);

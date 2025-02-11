@@ -260,10 +260,19 @@ contract DSCEngineTest is StdCheats, Test {
         vm.stopPrank();
     }
 
-    function testCantBurnMoreThanUserHas() public {
+    function testCantBurnIfUserHasZeroBalance() public {
         vm.prank(user);
         vm.expectRevert();
         dsce.burnDsc(1);
+    }
+
+    function testCannotBurnMoreThanCurrentBalance() public depositedCollateralAndMintedDsc {
+        uint256 burnAmountMoreThanBalance = 101 ether;
+        vm.startPrank(user);
+        dsc.approve(address(dsce), burnAmountMoreThanBalance);
+        vm.expectRevert(DSCEngine.DSCEngine__BurnAmountExceededBalance.selector);
+        dsce.burnDsc(burnAmountMoreThanBalance);
+        vm.stopPrank();
     }
 
     function testCanBurnDsc() public depositedCollateralAndMintedDsc {

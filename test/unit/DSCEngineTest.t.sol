@@ -260,10 +260,23 @@ contract DSCEngineTest is StdCheats, Test {
         vm.stopPrank();
     }
 
-    function testCantBurnMoreThanUserHas() public {
+    function testCantBurnIfUserHasZeroBalance() public {
         vm.prank(user);
         vm.expectRevert();
         dsce.burnDsc(1);
+    }
+
+    function testCannotBurnMoreThanCurrentBalance() public depositedCollateralAndMintedDsc {
+        uint256 burnAmountMoreThanBalance = 101 ether;
+        vm.startPrank(user);
+        dsc.approve(address(dsce), burnAmountMoreThanBalance);
+        vm.expectRevert(
+            abi.encodeWithSelector(
+                DSCEngine.DSCEngine__BurnAmountExceededBalance.selector, burnAmountMoreThanBalance, amountToMint
+            )
+        );
+        dsce.burnDsc(burnAmountMoreThanBalance);
+        vm.stopPrank();
     }
 
     function testCanBurnDsc() public depositedCollateralAndMintedDsc {
@@ -310,6 +323,18 @@ contract DSCEngineTest is StdCheats, Test {
         dsce.depositCollateralAndMintDsc(weth, amountCollateral, amountToMint);
         vm.expectRevert(DSCEngine.DSCEngine__NeedsMoreThanZero.selector);
         dsce.redeemCollateral(weth, 0);
+        vm.stopPrank();
+    }
+
+    function testCannotRedeemMoreThanDeposited() public depositedCollateral {
+        uint256 amountToRedeem = 11 ether;
+        vm.startPrank(user);
+        vm.expectRevert(
+            abi.encodeWithSelector(
+                DSCEngine.DSCEngine__RedeemAmountMoreThanDeposited.selector, amountToRedeem, amountCollateral
+            )
+        );
+        dsce.redeemCollateral(weth, amountToRedeem);
         vm.stopPrank();
     }
 

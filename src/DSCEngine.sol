@@ -25,7 +25,7 @@
 pragma solidity 0.8.19;
 
 import { OracleLib, AggregatorV3Interface } from "./libraries/OracleLib.sol";
-// The correct path for ReentrancyGuard in latest Openzeppelin contracts is 
+// The correct path for ReentrancyGuard in latest Openzeppelin contracts is
 //"import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import { ReentrancyGuard } from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
@@ -62,6 +62,8 @@ contract DSCEngine is ReentrancyGuard {
     error DSCEngine__MintFailed();
     error DSCEngine__HealthFactorOk();
     error DSCEngine__HealthFactorNotImproved();
+    error DSCEngine__BurnAmountExceededBalance(uint256 burnAmount, uint256 totalDscMinted);
+    error DSCEngine__RedeemAmountMoreThanDeposited(uint256 redeemAmount, uint256 depositedAmount);
 
     ///////////////////
     // Types
@@ -297,6 +299,10 @@ contract DSCEngine is ReentrancyGuard {
     )
         private
     {
+        uint256 collateralBalance = s_collateralDeposited[from][tokenCollateralAddress];
+        if (collateralBalance < amountCollateral) {
+            revert DSCEngine__RedeemAmountMoreThanDeposited(amountCollateral, collateralBalance);
+        }
         s_collateralDeposited[from][tokenCollateralAddress] -= amountCollateral;
         emit CollateralRedeemed(from, to, tokenCollateralAddress, amountCollateral);
         bool success = IERC20(tokenCollateralAddress).transfer(to, amountCollateral);
@@ -306,6 +312,10 @@ contract DSCEngine is ReentrancyGuard {
     }
 
     function _burnDsc(uint256 amountDscToBurn, address onBehalfOf, address dscFrom) private {
+        uint256 totalDSCMinted = s_DSCMinted[onBehalfOf];
+        if (totalDSCMinted < amountDscToBurn) {
+            revert DSCEngine__BurnAmountExceededBalance(amountDscToBurn, totalDSCMinted);
+        }
         s_DSCMinted[onBehalfOf] -= amountDscToBurn;
 
         bool success = i_dsc.transferFrom(dscFrom, address(this), amountDscToBurn);

@@ -315,11 +315,14 @@ contract DSCEngineTest is StdCheats, Test {
 
     function testCanRedeemCollateral() public depositedCollateral {
         vm.startPrank(user);
+        uint256 userBalanceBeforeRedeem = dsce.getCollateralBalanceOfUser(user, weth);
+        assertEq(userBalanceBeforeRedeem, amountCollateral);
         dsce.redeemCollateral(weth, amountCollateral);
-        uint256 userBalance = ERC20Mock(weth).balanceOf(user);
-        assertEq(userBalance, amountCollateral);
+        uint256 userBalanceAfterRedeem = dsce.getCollateralBalanceOfUser(user, weth);
+        assertEq(userBalanceAfterRedeem, 0);
         vm.stopPrank();
     }
+
 
     function testEmitCollateralRedeemedWithCorrectArgs() public depositedCollateral {
         vm.expectEmit(true, true, true, true, address(dsce));

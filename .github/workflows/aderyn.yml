@@ -3,29 +3,29 @@ on: [push, pull_request, workflow_dispatch]
 name: Run Aderyn
 
 jobs:
-    check:
-      name: Check
-      runs-on: ubuntu-latest
-      steps:
-        - name: Checkout sources
-          uses: actions/checkout@v2
+  check:
+    name: Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v2
 
-        - name: Install aderyn
-          run: |
-            curl -L https://raw.githubusercontent.com/Cyfrin/aderyn/dev/cyfrinup/install | bash
-            source /home/runner/.bashrc
-            cyfrinup        
+      - name: Install aderyn
+        run: |
+          curl -L https://raw.githubusercontent.com/Cyfrin/aderyn/dev/cyfrinup/install | bash
+          export PATH="$HOME/.cyfrin/bin:$PATH"  # Add Cyfrin tools to PATH
+          cyfrinup  # Now this command will be found
 
-        - name: Run aderyn
-          run: |
-            export PATH="/home/runner/.cyfrin/bin:$PATH"
-            aderyn . -o ci-report.json
-        
-        - name: Check report
-          run: |
-            jq '.issue_count | .critical, .high, .medium' ci-report.json | while read value; do
-                if [ "$value" -gt 0 ]; then
+      - name: Run aderyn
+        run: |
+          export PATH="$HOME/.cyfrin/bin:$PATH"  # Ensure PATH is set for this step too
+          aderyn . -o ci-report.json
+
+      - name: Check report
+        run: |
+          jq '.issue_count | .critical, .high, .medium' ci-report.json | while read value; do
+              if [ "$value" -gt 0 ]; then
                 echo "Found issues: critical, high, or medium issue count is above zero."
                 exit 1
-                fi
-            done
+              fi
+          done

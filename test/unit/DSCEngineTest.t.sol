@@ -104,26 +104,22 @@ contract DSCEngineTest is StdCheats, Test {
     // depositCollateral Tests //
     ///////////////////////////////////////
 
-    // this test needs it's own setup
     function testRevertsIfTransferFromFails() public {
-        // Arrange - Setup
-        address owner = msg.sender;
-        vm.prank(owner);
-        MockFailedTransferFrom mockDsc = new MockFailedTransferFrom();
-        tokenAddresses = [address(mockDsc)];
-        feedAddresses = [ethUsdPriceFeed];
-        vm.prank(owner);
-        DSCEngine mockDsce = new DSCEngine(tokenAddresses, feedAddresses, address(mockDsc));
-        mockDsc.mint(user, amountCollateral);
-
-        vm.prank(owner);
-        mockDsc.transferOwnership(address(mockDsce));
-        // Arrange - User
-        vm.startPrank(user);
-        ERC20Mock(address(mockDsc)).approve(address(mockDsce), amountCollateral);
-        // Act / Assert
+        // In foundry,if you do not specify the caller,its msg.sender by default.
+        MockFailedTransferFrom _mockCollateralToken = new MockFailedTransferFrom();
+        tokenAddresses = [address(_mockCollateralToken)];
+        // The simple use of wethUsdPriceFeed as a mock oracle is a necessary condition, because this does not affect
+        // the testing of TransferFrom.
+        priceFeedAddresses = [wethUsdPriceFeed];
+        // Use DSC as a stablecoin
+        DSCEngine _mockDSCEngine = new DSCEngine(tokenAddresses, priceFeedAddresses, address(dsc));
+        // Mint tokens for users
+        _mockCollateralToken.mint(USER, STARTING_ERC20_BALANCE);
+        // Switch to USER identity to perform the test
+        vm.startPrank(USER);
+        _fakerToken.approve(address(_mockDSCEngine), amountCollateral);
         vm.expectRevert(DSCEngine.DSCEngine__TransferFailed.selector);
-        mockDsce.depositCollateral(address(mockDsc), amountCollateral);
+        _mockDSCEngine.depositCollateral(address(_mockCollateralToken), amountCollateral);
         vm.stopPrank();
     }
 
@@ -322,7 +318,6 @@ contract DSCEngineTest is StdCheats, Test {
         assertEq(userBalanceAfterRedeem, 0);
         vm.stopPrank();
     }
-
 
     function testEmitCollateralRedeemedWithCorrectArgs() public depositedCollateral {
         vm.expectEmit(true, true, true, true, address(dsce));

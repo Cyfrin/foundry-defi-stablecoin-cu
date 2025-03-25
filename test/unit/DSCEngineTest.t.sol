@@ -104,26 +104,19 @@ contract DSCEngineTest is StdCheats, Test {
     // depositCollateral Tests //
     ///////////////////////////////////////
 
-    // this test needs it's own setup
     function testRevertsIfTransferFromFails() public {
-        // Arrange - Setup
-        address owner = msg.sender;
-        vm.prank(owner);
-        MockFailedTransferFrom mockDsc = new MockFailedTransferFrom();
-        tokenAddresses = [address(mockDsc)];
+        // In the foundry test, the default caller is msg.sender.We do not need to specify particularly.
+        MockFailedTransferFrom mockCollateralToken = new MockFailedTransferFrom();
+        tokenAddresses = [address(mockCollateralToken)];
         feedAddresses = [ethUsdPriceFeed];
-        vm.prank(owner);
-        DSCEngine mockDsce = new DSCEngine(tokenAddresses, feedAddresses, address(mockDsc));
-        mockDsc.mint(user, amountCollateral);
-
-        vm.prank(owner);
-        mockDsc.transferOwnership(address(mockDsce));
-        // Arrange - User
+        // DSCEngine receives the third parameter as dscAddress, not the tokenAddress used as collateral.
+        DSCEngine mockDsce = new DSCEngine(tokenAddresses, feedAddresses, address(dsc));
+        mockCollateralToken.mint(user, amountCollateral);
         vm.startPrank(user);
-        ERC20Mock(address(mockDsc)).approve(address(mockDsce), amountCollateral);
+        ERC20Mock(address(mockCollateralToken)).approve(address(mockDsce), amountCollateral);
         // Act / Assert
         vm.expectRevert(DSCEngine.DSCEngine__TransferFailed.selector);
-        mockDsce.depositCollateral(address(mockDsc), amountCollateral);
+        mockDsce.depositCollateral(address(mockCollateralToken), amountCollateral);
         vm.stopPrank();
     }
 
@@ -322,7 +315,6 @@ contract DSCEngineTest is StdCheats, Test {
         assertEq(userBalanceAfterRedeem, 0);
         vm.stopPrank();
     }
-
 
     function testEmitCollateralRedeemedWithCorrectArgs() public depositedCollateral {
         vm.expectEmit(true, true, true, true, address(dsce));

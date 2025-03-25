@@ -51,12 +51,12 @@ contract ContinueOnRevertInvariants is StdInvariant, Test {
     }
 
     /// forge-config: default.invariant.fail-on-revert = false
-    function invariant_protocolMustHaveMoreValueThatTotalSupplyDollars() public view {
+    function invariant_protocolMustHaveMoreValueThanTotalSupplyDollars() public view {
         uint256 totalSupply = dsc.totalSupply();
-        uint256 wethDeposted = ERC20Mock(weth).balanceOf(address(dsce));
+        uint256 wethDeposited = ERC20Mock(weth).balanceOf(address(dsce));
         uint256 wbtcDeposited = ERC20Mock(wbtc).balanceOf(address(dsce));
 
-        uint256 wethValue = dsce.getUsdValue(weth, wethDeposted);
+        uint256 wethValue = dsce.getUsdValue(weth, wethDeposited);
         uint256 wbtcValue = dsce.getUsdValue(wbtc, wbtcDeposited);
 
         console.log("wethValue: %s", wethValue);
@@ -65,7 +65,7 @@ contract ContinueOnRevertInvariants is StdInvariant, Test {
         assert(wethValue + wbtcValue >= totalSupply);
     }
 
-    // function invariant_userCantCreateStabelcoinWithPoorHealthFactor() public {}
+    // function invariant_userCantCreateStablecoinWithPoorHealthFactor() public {}
 
     /// forge-config: default.invariant.fail-on-revert = false
     function invariant_callSummary() public view {

@@ -62,6 +62,7 @@ contract DSCEngine is ReentrancyGuard {
     error DSCEngine__MintFailed();
     error DSCEngine__HealthFactorOk();
     error DSCEngine__HealthFactorNotImproved();
+    error DSCEngine__MustBeMoreThanMinCollateralValue();
 
     ///////////////////
     // Types
@@ -77,6 +78,7 @@ contract DSCEngine is ReentrancyGuard {
     uint256 private constant LIQUIDATION_BONUS = 10; // This means you get assets at a 10% discount when liquidating
     uint256 private constant LIQUIDATION_PRECISION = 100;
     uint256 private constant MIN_HEALTH_FACTOR = 1e18;
+    uint256 private constant MIN_COLLATERAL_VALUE = 100 * 1e18;
     uint256 private constant PRECISION = 1e18;
     uint256 private constant ADDITIONAL_FEED_PRECISION = 1e10;
     uint256 private constant FEED_PRECISION = 1e8;
@@ -181,8 +183,8 @@ contract DSCEngine is ReentrancyGuard {
         uint256 amountCollateral
     )
         external
-        moreThanZero(amountCollateral)
         nonReentrant
+        moreThanZero(amountCollateral)
         isAllowedToken(tokenCollateralAddress)
     {
         _redeemCollateral(tokenCollateralAddress, amountCollateral, msg.sender, msg.sender);
@@ -220,9 +222,9 @@ contract DSCEngine is ReentrancyGuard {
         uint256 debtToCover
     )
         external
+        nonReentrant
         isAllowedToken(collateral)
         moreThanZero(debtToCover)
-        nonReentrant
     {
         uint256 startingUserHealthFactor = _healthFactor(user);
         if (startingUserHealthFactor >= MIN_HEALTH_FACTOR) {
@@ -274,10 +276,13 @@ contract DSCEngine is ReentrancyGuard {
         uint256 amountCollateral
     )
         public
-        moreThanZero(amountCollateral)
         nonReentrant
+        moreThanZero(amountCollateral)
         isAllowedToken(tokenCollateralAddress)
     {
+        if(_getUsdValue(tokenCollateralAddress, amountCollateral) < MIN_COLLATERAL_VALUE) {
+            revert DSCEngine__MustBeMoreThanMinCollateralValue();
+        }
         s_collateralDeposited[msg.sender][tokenCollateralAddress] += amountCollateral;
         emit CollateralDeposited(msg.sender, tokenCollateralAddress, amountCollateral);
         bool success = IERC20(tokenCollateralAddress).transferFrom(msg.sender, address(this), amountCollateral);

@@ -105,11 +105,13 @@ contract DSCEngineTest is StdCheats, Test {
     ///////////////////////////////////////
 
     function testRevertsIfTransferFromFails() public {
-        // In the foundry test, the default caller is msg.sender.We do not need to specify particularly.
+        address owner = msg.sender;
+        vm.prank(owner);
         MockFailedTransferFrom mockCollateralToken = new MockFailedTransferFrom();
         tokenAddresses = [address(mockCollateralToken)];
         feedAddresses = [ethUsdPriceFeed];
         // DSCEngine receives the third parameter as dscAddress, not the tokenAddress used as collateral.
+        vm.prank(owner);
         DSCEngine mockDsce = new DSCEngine(tokenAddresses, feedAddresses, address(dsc));
         mockCollateralToken.mint(user, amountCollateral);
         vm.startPrank(user);

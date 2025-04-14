@@ -54,7 +54,7 @@ contract HelperConfig is Script {
         ERC20Mock wbtcMock = new ERC20Mock("WBTC", "WBTC", msg.sender, 1000e8);
         vm.stopBroadcast();
 
-        anvilNetworkConfig = NetworkConfig({
+        return NetworkConfig({
             wethUsdPriceFeed: address(ethUsdPriceFeed), // ETH / USD
             wbtcUsdPriceFeed: address(btcUsdPriceFeed),
             weth: address(wethMock),

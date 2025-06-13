@@ -62,6 +62,7 @@ contract DSCEngine is ReentrancyGuard {
     error DSCEngine__MintFailed();
     error DSCEngine__HealthFactorOk();
     error DSCEngine__HealthFactorNotImproved();
+    error DSCEngine__CannotLiquidateSelf();
 
     ///////////////////
     // Types
@@ -224,6 +225,12 @@ contract DSCEngine is ReentrancyGuard {
         moreThanZero(debtToCover)
         nonReentrant
     {
+        // Check that the user is insolvent
+        // can not allow user to liquidate themselves
+        if (user == msg.sender) {
+            revert DSCEngine__CannotLiquidateSelf();
+        }
+        
         uint256 startingUserHealthFactor = _healthFactor(user);
         if (startingUserHealthFactor >= MIN_HEALTH_FACTOR) {
             revert DSCEngine__HealthFactorOk();

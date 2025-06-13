@@ -62,6 +62,7 @@ contract DSCEngine is ReentrancyGuard {
     error DSCEngine__MintFailed();
     error DSCEngine__HealthFactorOk();
     error DSCEngine__HealthFactorNotImproved();
+    error DSCEngine__CannotLiquidateSelf();
 
     ///////////////////
     // Types
@@ -216,7 +217,7 @@ contract DSCEngine is ReentrancyGuard {
      */
     function liquidate(
         address collateral,
-        address user,
+        address borrower,
         uint256 debtToCover
     )
         external
@@ -224,7 +225,15 @@ contract DSCEngine is ReentrancyGuard {
         moreThanZero(debtToCover)
         nonReentrant
     {
-        uint256 startingUserHealthFactor = _healthFactor(user);
+        // We don't want to allow a user to liquidate themselves
+        // We need to make sure the borrower is insolvent
+        // This is a security feature to prevent users from liquidating themselves
+        // and getting their collateral back for free
+        if(borrower == msg.sender) {
+            revert DSCEngine__CannotLiquidateSelf();
+        }
+        
+        uint256 startingUserHealthFactor = _healthFactor(borrower);
         if (startingUserHealthFactor >= MIN_HEALTH_FACTOR) {
             revert DSCEngine__HealthFactorOk();
         }
@@ -237,10 +246,10 @@ contract DSCEngine is ReentrancyGuard {
         uint256 bonusCollateral = (tokenAmountFromDebtCovered * LIQUIDATION_BONUS) / LIQUIDATION_PRECISION;
         // Burn DSC equal to debtToCover
         // Figure out how much collateral to recover based on how much burnt
-        _redeemCollateral(collateral, tokenAmountFromDebtCovered + bonusCollateral, user, msg.sender);
-        _burnDsc(debtToCover, user, msg.sender);
+        _redeemCollateral(collateral, tokenAmountFromDebtCovered + bonusCollateral, borrower, msg.sender);
+        _burnDsc(debtToCover, borrower, msg.sender);
 
-        uint256 endingUserHealthFactor = _healthFactor(user);
+        uint256 endingUserHealthFactor = _healthFactor(borrower);
         // This conditional should never hit, but just in case
         if (endingUserHealthFactor <= startingUserHealthFactor) {
             revert DSCEngine__HealthFactorNotImproved();

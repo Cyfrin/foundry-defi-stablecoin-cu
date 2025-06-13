@@ -225,8 +225,8 @@ contract DSCEngine is ReentrancyGuard {
         moreThanZero(debtToCover)
         nonReentrant
     {
-        // We don't want to allow a user to liquidate themselves
-        // We need to make sure the borrower is insolvent
+        // We don't want to allow a user to liquidate themselves.
+        // We need to make sure the borrower is insolvent.
         // This is a security feature to prevent users from liquidating themselves
         // and getting their collateral back for free
         if(borrower == msg.sender) {

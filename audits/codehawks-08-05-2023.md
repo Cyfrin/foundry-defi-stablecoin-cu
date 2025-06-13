@@ -21,7 +21,6 @@
     - [M-10. Protocol can break for a token with a proxy and implementation contract (like `TUSD`)](#M-10)
     - [M-11. Liquidators can be front-run to their loss](#M-11)
     - [M-12. DoS of full liquidations are possible by frontrunning the liquidators](#M-12)
-    - [M-13.](#M-13)
 - ## Low Risk Findings
     - [L-01. Improving the burnDsc() to allow users to mitigate their liquidation's impact](#L-01)
     - [L-02. Zero address check for tokens](#L-02)

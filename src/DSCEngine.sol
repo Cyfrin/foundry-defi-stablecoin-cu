@@ -25,7 +25,7 @@
 pragma solidity 0.8.19;
 
 import { OracleLib, AggregatorV3Interface } from "./libraries/OracleLib.sol";
-// The correct path for ReentrancyGuard in latest Openzeppelin contracts is 
+// The correct path for ReentrancyGuard in latest Openzeppelin contracts is
 //"import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import { ReentrancyGuard } from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
@@ -167,7 +167,7 @@ contract DSCEngine is ReentrancyGuard {
     {
         _burnDsc(amountDscToBurn, msg.sender, msg.sender);
         _redeemCollateral(tokenCollateralAddress, amountCollateral, msg.sender, msg.sender);
-        revertIfHealthFactorIsBroken(msg.sender);
+        _revertIfHealthFactorIsBroken(msg.sender);
     }
 
     /*
@@ -186,7 +186,7 @@ contract DSCEngine is ReentrancyGuard {
         isAllowedToken(tokenCollateralAddress)
     {
         _redeemCollateral(tokenCollateralAddress, amountCollateral, msg.sender, msg.sender);
-        revertIfHealthFactorIsBroken(msg.sender);
+        _revertIfHealthFactorIsBroken(msg.sender);
     }
 
     /*
@@ -196,7 +196,7 @@ contract DSCEngine is ReentrancyGuard {
      */
     function burnDsc(uint256 amount) external moreThanZero(amount) {
         _burnDsc(amount, msg.sender, msg.sender);
-        revertIfHealthFactorIsBroken(msg.sender); // I don't think this would ever hit...
+        _revertIfHealthFactorIsBroken(msg.sender); // I don't think this would ever hit...
     }
 
     /*
@@ -245,7 +245,7 @@ contract DSCEngine is ReentrancyGuard {
         if (endingUserHealthFactor <= startingUserHealthFactor) {
             revert DSCEngine__HealthFactorNotImproved();
         }
-        revertIfHealthFactorIsBroken(msg.sender);
+        _revertIfHealthFactorIsBroken(msg.sender);
     }
 
     ///////////////////
@@ -257,7 +257,7 @@ contract DSCEngine is ReentrancyGuard {
      */
     function mintDsc(uint256 amountDscToMint) public moreThanZero(amountDscToMint) nonReentrant {
         s_DSCMinted[msg.sender] += amountDscToMint;
-        revertIfHealthFactorIsBroken(msg.sender);
+        _revertIfHealthFactorIsBroken(msg.sender);
         bool minted = i_dsc.mint(msg.sender, amountDscToMint);
 
         if (minted != true) {
@@ -357,7 +357,7 @@ contract DSCEngine is ReentrancyGuard {
         return (collateralAdjustedForThreshold * PRECISION) / totalDscMinted;
     }
 
-    function revertIfHealthFactorIsBroken(address user) internal view {
+    function _revertIfHealthFactorIsBroken(address user) internal view {
         uint256 userHealthFactor = _healthFactor(user);
         if (userHealthFactor < MIN_HEALTH_FACTOR) {
             revert DSCEngine__BreaksHealthFactor(userHealthFactor);

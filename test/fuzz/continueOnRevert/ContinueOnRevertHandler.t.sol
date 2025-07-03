@@ -14,7 +14,6 @@ import { DSCEngine, AggregatorV3Interface } from "../../../src/DSCEngine.sol";
 import { DecentralizedStableCoin } from "../../../src/DecentralizedStableCoin.sol";
 // import {Randomish, EnumerableSet} from "../Randomish.sol"; // Randomish is not found in the codebase, EnumerableSet
 // is imported from openzeppelin
-import { MockV3Aggregator } from "../../mocks/MockV3Aggregator.sol";
 import { console } from "forge-std/console.sol";
 
 contract ContinueOnRevertHandler is Test {

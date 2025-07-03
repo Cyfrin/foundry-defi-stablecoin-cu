@@ -57,7 +57,7 @@ If you can't or don't want to run and install locally, you can work with this re
 
 # Updates
 
-- The latest version of openzeppelin-contracts has changes in the ERC20Mock file. To follow along with the course, you need to install version 4.8.3 which can be done by `forge install openzeppelin/openzeppelin-contracts@v4.8.3 --no-commit` instead of `forge install openzeppelin/openzeppelin-contracts --no-commit`
+- The latest version of openzeppelin-contracts has changes in the ERC20Mock file. To follow along with the course, you need to install version 4.8.3 which can be done by `forge install openzeppelin/openzeppelin-contracts@v4.8.3` instead of `forge install openzeppelin/openzeppelin-contracts`
 
 # Usage
 

@@ -68,7 +68,7 @@
     - [G-36. Imports could be organized more systematically](#g-36-imports-could-be-organized-more-systematically)
     - [G-37. Unnecessary argument in getTimeout function](#g-37-unnecessary-argument-in-gettimeout-function)
     - [G-38. Not respecting the Checks-Effects-Interactions pattern that can be a place for bugs](#g-38-not-respecting-the-checks-effects-interactions-pattern-that-can-be-a-place-for-bugs)
-    - [G-39. >= costs less gas than >](#g-39--costs-less-gas-than)
+    - [G-39. >= costs less gas than >](#g-39--costs-less-gas-than-)
     - [G-40. [L-03] Continues with the standard use for Collateral variable](#g-40-l-03-continues-with-the-standard-use-for-collateral-variable)
     - [G-41. Wrong comment DecentralizedStableCoin.sol](#g-41-wrong-comment-decentralizedstablecoinsol)
     - [G-42. Consider disabling renounceOwnership()](#g-42-consider-disabling-renounceownership)

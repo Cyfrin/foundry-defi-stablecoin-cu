@@ -1,80 +1,80 @@
 # Foundry DeFi Stablecoin CodeHawks Audit Contest - Findings Report
 
 # Table of contents
-- ### [Contest Summary](#contest-summary)
-- ### [Results Summary](#results-summary)
+- ### [Contest Summary](#contest-summary-1)
+- ### [Results Summary](#results-summary-1)
 - ## High Risk Findings
-    - [H-01. Theft of collateral tokens with fewer than 18 decimals](#H-01)
-    - [H-02. Liquidation Is Prevented Due To Strict Implementation of Liqudation Bonus](#H-02)
-    - [H-03. There is no incentive to liquidate small positions](#H-03)
-    - [H-04. Business Logic: Protocol Liquidation Arithmetic](#H-04)
+    - [H-01. Theft of collateral tokens with fewer than 18 decimals](#h-01-theft-of-collateral-tokens-with-fewer-than-18-decimals)
+    - [H-02. Liquidation Is Prevented Due To Strict Implementation of Liquidation Bonus](#h-02-liquidation-is-prevented-due-to-strict-implementation-of-liquidation-bonus)
+    - [H-03. There is no incentive to liquidate small positions](#h-03-there-is-no-incentive-to-liquidate-small-positions)
+    - [H-04. Business Logic: Protocol Liquidation Arithmetic](#h-04-business-logic-protocol-liquidation-arithmetic)
 - ## Medium Risk Findings
-    - [M-01. staleCheckLatestRoundData() does not check the status of the Arbitrum sequencer in Chainlink feeds.](#M-01)
-    - [M-02. DSC protocol can consume stale price data or cannot operate on some EVM chains](#M-02)
-    - [M-03. Chainlink oracle will return the wrong price if the aggregator hits `minAnswer`](#M-03)
-    - [M-04. All of the USD pair price feeds doesn't have 8 decimals](#M-04)
-    - [M-05. Anyone can burn **DecentralizedStableCoin** tokens with `burnFrom` function](#M-05)
-    - [M-06. Double-spending vulnerability leads to a disruption of the DSC token](#M-06)
-    - [M-07. Lack of fallbacks for price feed oracle](#M-07)
-    - [M-08. Too many DSC tokens can get minted for fee-on-transfer tokens.](#M-08)
-    - [M-09. `liquidate` does not allow the liquidator to liquidate a user if the liquidator HF < 1](#M-09)
-    - [M-10. Protocol can break for a token with a proxy and implementation contract (like `TUSD`)](#M-10)
-    - [M-11. Liquidators can be front-run to their loss](#M-11)
-    - [M-12. DoS of full liquidations are possible by frontrunning the liquidators](#M-12)
+    - [M-01. staleCheckLatestRoundData() does not check the status of the Arbitrum sequencer in Chainlink feeds](#m-01-stalechecklatestrounddata-does-not-check-the-status-of-the-arbitrum-sequencer-in-chainlink-feeds)
+    - [M-02. DSC protocol can consume stale price data or cannot operate on some EVM chains](#m-02-dsc-protocol-can-consume-stale-price-data-or-cannot-operate-on-some-evm-chains)
+    - [M-03. Chainlink oracle will return the wrong price if the aggregator hits `minAnswer`](#m-03-chainlink-oracle-will-return-the-wrong-price-if-the-aggregator-hits-minanswer)
+    - [M-04. All of the USD pair price feeds doesn't have 8 decimals](#m-04-all-of-the-usd-pair-price-feeds-doesnt-have-8-decimals)
+    - [M-05. Anyone can burn **DecentralizedStableCoin** tokens with `burnFrom` function](#m-05-anyone-can-burn-decentralizedstablecoin-tokens-with-burnfrom-function)
+    - [M-06. Double-spending vulnerability leads to a disruption of the DSC token](#m-06-double-spending-vulnerability-leads-to-a-disruption-of-the-dsc-token)
+    - [M-07. Lack of fallbacks for price feed oracle](#m-07-lack-of-fallbacks-for-price-feed-oracle)
+    - [M-08. Too many DSC tokens can get minted for fee-on-transfer tokens](#m-08-too-many-dsc-tokens-can-get-minted-for-fee-on-transfer-tokens)
+    - [M-09. `liquidate` does not allow the liquidator to liquidate a user if the liquidator HF < 1](#m-09-liquidate-does-not-allow-the-liquidator-to-liquidate-a-user-if-the-liquidator-hf--1)
+    - [M-10. Protocol can break for a token with a proxy and implementation contract (like `TUSD`)](#m-10-protocol-can-break-for-a-token-with-a-proxy-and-implementation-contract-like-tusd)
+    - [M-11. Liquidators can be front-run to their loss](#m-11-liquidators-can-be-front-run-to-their-loss)
+    - [M-12. DoS of full liquidations are possible by frontrunning the liquidators](#m-12-dos-of-full-liquidations-are-possible-by-frontrunning-the-liquidators)
 - ## Low Risk Findings
-    - [L-01. Improving the burnDsc() to allow users to mitigate their liquidation's impact](#L-01)
-    - [L-02. Zero address check for tokens](#L-02)
-    - [L-03. Lack of events for critical actions](#L-03)
-    - [L-04. Pragma isn't specified correctly which can lead to nonfunction/damaged contract when deployed on Arbitrum](#L-04)
-    - [L-05. Precision loss when calculating the health factor](#L-05)
-    - [L-06. Unbounded Loops Found in DSCEngine.sol can lead to DoS of liquidations](#L-06)
-    - [L-07. Missing Division By 0 Check](#L-07)
+    - [L-01. Improving the burnDsc() to allow users to mitigate their liquidation's impact](#l-01-improving-the-burndsc-to-allow-users-to-mitigate-their-liquidations-impact)
+    - [L-02. Zero address check for tokens](#l-02-zero-address-check-for-tokens)
+    - [L-03. Lack of events for critical actions](#l-03-lack-of-events-for-critical-actions)
+    - [L-04. Pragma isn't specified correctly which can lead to nonfunction/damaged contract when deployed on Arbitrum](#l-04-pragma-isnt-specified-correctly-which-can-lead-to-nonfunctiondamaged-contract-when-deployed-on-arbitrum)
+    - [L-05. Precision loss when calculating the health factor](#l-05-precision-loss-when-calculating-the-health-factor)
+    - [L-06. Unbounded Loops Found in DSCEngine.sol can lead to DoS of liquidations](#l-06-unbounded-loops-found-in-dscenginesol-can-lead-to-dos-of-liquidations)
+    - [L-07. Missing Division By 0 Check](#l-07-missing-division-by-0-check)
 - ## Gas Optimizations / Informationals
-    - [G-01. using x=x+y /x=x-y  is more gas efficient than x+=y / x-=y](#G-01)
-    - [G-02. Remove unused variables in `OracleLib`](#G-02)
-    - [G-03. Use constants instead of `type(uint256).max`](#G-03)
-    - [G-04. Double checks](#G-04)
-    - [G-05. `DSCEngine` should deploy its own `DecentralizedStableCoin`](#G-05)
-    - [G-06. `burn()` and `staleCheckLatestRoundData()` and `getTimeout()` can be `external`](#G-06)
-    - [G-07. Replace OZ's library with Solmate to save gas](#G-07)
-    - [G-08. Use `==` instead for `<=` for `uints` when comparing for `zero` values](#G-08)
-    - [G-09. # `_burnDsc` function on `DSCEngine` can be simplified](#G-09)
-    - [G-10. `Ownable` and `ERC20Burneable` implementations arent necesary in `DecentralizedStableCoin`](#G-10)
-    - [G-11. `++i`/`i++` should be `unchecked{++i}`/`unchecked{i++}` when it is not possible for them to overflow, as is the case when used in `for`- and `while`-loops](#G-11)
-    - [G-12. No amountCollateral > balance check](#G-12)
-    - [G-13. Constants should be be used for hardcoded values](#G-13)
-    - [G-14. [L-02] It is not specified which token is not allowed ](#G-14)
-    - [G-15. DSC Mint will either return true or revert, thus checking `minted` status in `mintDcs` is unnecessary](#G-15)
-    - [G-16. Spelling errors](#G-16)
-    - [G-17. Non Critical Issues：Discrepancy between code and comments](#G-17)
-    - [G-18. The nonReentrant modifier should occur before all other modifiers](#G-18)
-    - [G-19. Underscore function arguments ](#G-19)
-    - [G-20. Better Consistently Named Custom Errors ](#G-20)
-    - [G-21. Combine Multiple Mapping Address](#G-21)
-    - [G-22. [G-01] - Use `do-while` loop instead of `for-loop` to save users gas cost.](#G-22)
-    - [G-23. Redundant check for transfer success](#G-23)
-    - [G-24. Misleading comment in DSCEngine._healthFactor](#G-24)
-    - [G-25. Prefer array assignment over pushing elements in for-loops](#G-25)
-    - [G-26. [I-1] NatSpec `@param` is missing](#G-26)
-    - [G-27. NatSpec `@return` argument is missing](#G-27)
-    - [G-28. [I-4] Constants in comparisons should appear on the left side](#G-28)
-    - [G-29. [I-10] Functions not used internally could be marked external](#G-29)
-    - [G-30. Use `assembly` to check for `address(0)`](#G-30)
-    - [G-31. Misleading NatSpec for redeemCollateral function](#G-31)
-    - [G-32. Use hardcode address instead address(this)](#G-32)
-    - [G-33. Using `nonReentrant` when it's unnecessary](#G-33)
-    - [G-34. Improve the error being thrown](#G-34)
-    - [G-35. More documentation is preferred](#G-35)
-    - [G-36. Imports could be organized more systematically](#G-36)
-    - [G-37. Unnesessery argument in getTimeout function](#G-37)
-    - [G-38. Not respecting the Checks-Effects-Interactions pattern that can be a place for bugs](#G-38)
-    - [G-39. >= costs less gas than >](#G-39)
-    - [G-40. [L-03] Continues with the standard use for Collateral variable](#G-40)
-    - [G-41. Wrong comment DecentralizedStableCoin.sol](#G-41)
-    - [G-42. Consider disabling renounceOwnership()](#G-42)
-    - [G-43. Boolean equality](#G-43)
-    - [G-44. Amounts should be checked for `0` before calling a `transfer`](#G-44)
-    - [G-45. collateral and debt to cover not validated](#G-45)
+    - [G-01. using x=x+y /x=x-y  is more gas efficient than x+=y / x-=y](#g-01-using-xxy-xx-y-is-more-gas-efficient-than-xy--x-y)
+    - [G-02. Remove unused variables in `OracleLib`](#g-02-remove-unused-variables-in-oraclelib)
+    - [G-03. Use constants instead of `type(uint256).max`](#g-03-use-constants-instead-of-typeuint256max)
+    - [G-04. Double checks](#g-04-double-checks)
+    - [G-05. `DSCEngine` should deploy its own `DecentralizedStableCoin`](#g-05-dscengine-should-deploy-its-own-decentralizedstablecoin)
+    - [G-06. `burn()` and `staleCheckLatestRoundData()` and `getTimeout()` can be `external`](#g-06-burn-and-stalechecklatestrounddata-and-gettimeout-can-be-external)
+    - [G-07. Replace OZ's library with Solmate to save gas](#g-07-replace-ozs-library-with-solmate-to-save-gas)
+    - [G-08. Use `==` instead for `<=` for `uints` when comparing for `zero` values](#g-08-use--instead-for--for-uints-when-comparing-for-zero-values)
+    - [G-09. # `_burnDsc` function on `DSCEngine` can be simplified](#g-09--_burndsc-function-on-dscengine-can-be-simplified)
+    - [G-10. `Ownable` and `ERC20Burneable` implementations arent necessary in `DecentralizedStableCoin`](#g-10-ownable-and-erc20burneable-implementations-arent-necessary-in-decentralizedstablecoin)
+    - [G-11. `++i`/`i++` should be `unchecked{++i}`/`unchecked{i++}` when it is not possible for them to overflow, as is the case when used in `for`- and `while`-loops](#g-11-ii-should-be-uncheckediuncheckedi-when-it-is-not-possible-for-them-to-overflow-as-is-the-case-when-used-in-for--and-while-loops)
+    - [G-12. No amountCollateral > balance check](#g-12-no-amountcollateral--balance-check)
+    - [G-13. Constants should be used for hardcoded values](#g-13-constants-should-be-used-for-hardcoded-values)
+    - [G-14. [L-02] It is not specified which token is not allowed ](#g-14-l-02-it-is-not-specified-which-token-is-not-allowed)
+    - [G-15. DSC Mint will either return true or revert, thus checking `minted` status in `mintDcs` is unnecessary](#g-15-dsc-mint-will-either-return-true-or-revert-thus-checking-minted-status-in-mintdcs-is-unnecessary)
+    - [G-16. Spelling errors](#g-16-spelling-errors)
+    - [G-17. Non Critical Issues：Discrepancy between code and comments](#g-17-non-critical-issuesdiscrepancy-between-code-and-comments)
+    - [G-18. The nonReentrant modifier should occur before all other modifiers](#g-18-the-nonreentrant-modifier-should-occur-before-all-other-modifiers)
+    - [G-19. Underscore function arguments ](#g-19-underscore-function-arguments)
+    - [G-20. Better Consistently Named Custom Errors ](#g-20-better-consistently-named-custom-errors)
+    - [G-21. Combine Multiple Mapping Address](#g-21-combine-multiple-mapping-address)
+    - [G-22. [G-01] - Use `do-while` loop instead of `for-loop` to save users gas cost.](#g-22-g-01---use-do-while-loop-instead-of-for-loop-to-save-users-gas-cost)
+    - [G-23. Redundant check for transfer success](#g-23-redundant-check-for-transfer-success)
+    - [G-24. Misleading comment in DSCEngine._healthFactor](#g-24-misleading-comment-in-dscengine_healthfactor)
+    - [G-25. Prefer array assignment over pushing elements in for-loops](#g-25-prefer-array-assignment-over-pushing-elements-in-for-loops)
+    - [G-26. [I-1] NatSpec `@param` is missing](#g-26-i-1-natspec-param-is-missing)
+    - [G-27. NatSpec `@return` argument is missing](#g-27-natspec-return-argument-is-missing)
+    - [G-28. [I-4] Constants in comparisons should appear on the left side](#g-28-i-4-constants-in-comparisons-should-appear-on-the-left-side)
+    - [G-29. [I-10] Functions not used internally could be marked external](#g-29-i-10-functions-not-used-internally-could-be-marked-external)
+    - [G-30. Use `assembly` to check for `address(0)`](#g-30-use-assembly-to-check-for-address0)
+    - [G-31. Misleading NatSpec for redeemCollateral function](#g-31-misleading-natspec-for-redeemcollateral-function)
+    - [G-32. Use hardcode address instead address(this)](#g-32-use-hardcode-address-instead-addressthis)
+    - [G-33. Using `nonReentrant` when it's unnecessary](#g-33-using-nonreentrant-when-its-unnecessary)
+    - [G-34. Improve the error being thrown](#g-34-improve-the-error-being-thrown)
+    - [G-35. More documentation is preferred](#g-35-more-documentation-is-preferred)
+    - [G-36. Imports could be organized more systematically](#g-36-imports-could-be-organized-more-systematically)
+    - [G-37. Unnecessary argument in getTimeout function](#g-37-unnecessary-argument-in-gettimeout-function)
+    - [G-38. Not respecting the Checks-Effects-Interactions pattern that can be a place for bugs](#g-38-not-respecting-the-checks-effects-interactions-pattern-that-can-be-a-place-for-bugs)
+    - [G-39. >= costs less gas than >](#g-39--costs-less-gas-than-)
+    - [G-40. [L-03] Continues with the standard use for Collateral variable](#g-40-l-03-continues-with-the-standard-use-for-collateral-variable)
+    - [G-41. Wrong comment DecentralizedStableCoin.sol](#g-41-wrong-comment-decentralizedstablecoinsol)
+    - [G-42. Consider disabling renounceOwnership()](#g-42-consider-disabling-renounceownership)
+    - [G-43. Boolean equality](#g-43-boolean-equality)
+    - [G-44. Amounts should be checked for `0` before calling a `transfer`](#g-44-amounts-should-be-checked-for-0-before-calling-a-transfer)
+    - [G-45. collateral and debt to cover not validated](#g-45-collateral-and-debt-to-cover-not-validated)
 
 # <a id='contest-summary'></a>Contest Summary
 
@@ -615,7 +615,7 @@ index f697f8d..dc2de7d 100644
          vm.stopPrank();
          uint256 collateralValue = dsce.getAccountCollateralValue(user);
 ```
-## <a id='H-02'></a>H-02. Liquidation Is Prevented Due To Strict Implementation of Liqudation Bonus
+## <a id='H-02'></a>H-02. Liquidation Is Prevented Due To Strict Implementation of Liquidation Bonus
 
 _Submitted by [Bobface](/profile/clk572bex000wl5082nhslxbq), [carrotsmuggler](/profile/clkdvewih0000l909yza1oaop), [0xlemon](/profile/clk70p00n000gl5082o0iufja), [JohnnyTime](/profile/clk6vuje90014mm0800cqeo8w), [crippie](/profile/clkitmhs50000l508e5tvl2w2), [jprod15](/profile/clk71ssjy0004jt08zj3l9hui), [pengun](/profile/clkkjed3v0004mj08gpw0u7b2), [ljj](/profile/clk3ttrj4001mib08qqu3vgk4), [TeamFliBit](/team/clki07mfj0001la08ctbacja0), [chainNue](/profile/clkceb0jn000ol8082eekhkg8), [twcctop](/profile/clk6mih850004mj08wxagt5vo), [neocrao](/profile/clkq5kij0000amc083lbapqf7), [AlexCzm](/profile/clk7gew0m000gmi08sgbhts35), [No12Samurai](/profile/clk7mu64b000cme08wadtt1f6), [alymurtazamemon](/profile/clk3q1mog0000jr082dc9tipk), [Maroutis](/profile/clkctygft000il9088nkvgyqk). Selected submission by: [No12Samurai](/profile/clk7mu64b000cme08wadtt1f6)._      
 				
@@ -726,7 +726,7 @@ Manual Review
 
 ## Recommendations
 
-When the health factor is between 100 to 110%, make the liquidation bonus to the maximum possible amount, not the fix amount of `1.1 * liqudationAmount`. You can do that by adding the following code to the `liquidate()` function befre calling `_redeemCollateral()`:
+When the health factor is between 100 to 110%, make the liquidation bonus to the maximum possible amount, not the fix amount of `1.1 * liqudationAmount`. You can do that by adding the following code to the `liquidate()` function before calling `_redeemCollateral()`:
 
 ```solidity
 uint256 totalDepositedCollateral = s_collateralDeposited[user][collateral];
@@ -795,7 +795,7 @@ These are not all connected, but possibly can be:
 
 # Medium Risk Findings
 
-## <a id='M-01'></a>M-01. staleCheckLatestRoundData() does not check the status of the Arbitrum sequencer in Chainlink feeds.
+## <a id='M-01'></a>M-01. staleCheckLatestRoundData() does not check the status of the Arbitrum sequencer in Chainlink feeds
 
 _Submitted by [Madalad](/profile/clki3uj3i0000l508carwkhuh), [LaScaloneta](/team/clkgxjy6h0025lc080s97ux79), [StErMi](/profile/clk579hcp0014l508ybc3ec6z), [crippie](/profile/clkitmhs50000l508e5tvl2w2), [T1MOH](/profile/clk8mb22u001smg085mix29s8), [33audits](/profile/clkh3zf810018mi08yjzuvbu1), [Niki](/profile/clk53uz6j0008lc08sv8ltp2x), [zaevlad](/profile/clk4cjkez0004mo0871jg7ktq), [ss3434](/profile/clkjlzdd00028mm08xrtvvbp5), [pengun](/profile/clkkjed3v0004mj08gpw0u7b2), [ABA](/profile/clk43rqfo0008mg084q0ema3g), [0x3b](/profile/clk3yiyaq002imf088cd3644k), [sm4rty](/profile/clk4170ln003amb088n137st7), [aviggiano](/profile/clk3yu8m7001kjq08r9a7wgsh), [Phantasmagoria](/profile/clki6y71n000gkx088cowa4hq), [BenRai](/profile/clkksmnp8000sla08ob285wxl), [0xRizwan](/profile/clk7o7bq3000ome08az33iib2), [Polaristow](/profile/clk40hl6t000wmb08y3268i63), [TeamFliBit](/team/clki07mfj0001la08ctbacja0), [chainNue](/profile/clkceb0jn000ol8082eekhkg8), [tsvetanovv](/profile/clk3x0ilz001ol808l9uu6vpj), [Bauchibred](/profile/clk9ibj6p0002mh08c603lr2j), [Bauer](/profile/clkq7w3kv00awmr08rw8dmi8o), [Shogoki](/profile/clk41btup004qla08w6tg0mnp), [twcctop](/profile/clk6mih850004mj08wxagt5vo), [0x9527](/profile/clk6fywww000kk0089eqo3hem), [AlexCzm](/profile/clk7gew0m000gmi08sgbhts35), [0xMosh](/profile/clkab3oww0000kx08tbfkdxab), [pep7siup](/profile/clktaa8x50014mi08472cywse), [MrjoryStewartBaxter](/profile/clk6xkrq00008l708g23xstn9), [Juntao](/profile/clk86te0j000clh088i2uxcdh), [Crunch](/profile/clkttcnnz0014md08gh21vj4w), [pks27](/profile/clkc1tqhb0000jt08tz2r0wmq), [RugpullDetector](/profile/clknpmzwp0014l608wk9hflu6), [siguint](/profile/clkjgzom4000ol608ckckpo74), [mau](/profile/clk9v1fgt0008mn08czddr9to), [CircleLooper](/profile/clkvzob0p0000mc081440qgvp), [BLACK PANDA REACH](/team/clkgk6w82000djx09cwpz55ro), [serialcoder](/profile/clkb309g90008l208so2bzcy6), [paspe](/profile/clkbfdreo000ajo08lhhqgppp), [JMTT](/profile/clkwqqxzg000ol508oo61jf65), [honeymewn](/profile/clk4hhuqi0008mk08x47ah4w4), [ni8mare](/profile/clk3xgimw001mmf08gkbh3jbm), [natzuu](/profile/clk4nmoxk000kl308af0lunnk), [Avci](/profile/clkx1zq3i0018mq09o6h33o7o), [tsar](/profile/clk9isayj0004l30847ln1e8j), [owade](/profile/clk9j4mf20002mi08k4758eni), [0xdeadbeef](/profile/clke8rp1x0004jy08e1ddz8s0). Selected submission by: [MrjoryStewartBaxter](/profile/clk6xkrq00008l708g23xstn9)._      
 				
@@ -808,7 +808,7 @@ Given that the contract will be deployed on any EVM chain, when utilizing Chainl
 
 ## Vulnerability Details
 
-In the event of an Arbitrum Sequencer outage, the oracle data may become outdated, potentially leading to staleness. While the function  staleCheckLatestRoundData() provides checks if a price is stale, it does not check if Arbirtrum Sequencer is active. Since OracleLib.sol library is used to check the Chainlink Oracle for stale data, it is important to add this verification. You can review Chainlink docs on L2 Sequencer Uptime Feeds for more details on this. https://docs.chain.link/data-feeds/l2-sequencer-feeds 
+In the event of an Arbitrum Sequencer outage, the oracle data may become outdated, potentially leading to staleness. While the function  staleCheckLatestRoundData() provides checks if a price is stale, it does not check if Arbitrum Sequencer is active. Since OracleLib.sol library is used to check the Chainlink Oracle for stale data, it is important to add this verification. You can review Chainlink docs on L2 Sequencer Uptime Feeds for more details on this. https://docs.chain.link/data-feeds/l2-sequencer-feeds 
 
 
 ## Impact
@@ -1214,7 +1214,7 @@ Manual Review
 ## Recommendations
 
 I recommend implementing fallback solutions, such as using other off-chain oracle providers and/or on-chain Uniswap's TWAP, for feeding price data in case Chainlink's aggregators fail.
-## <a id='M-08'></a>M-08. Too many DSC tokens can get minted for fee-on-transfer tokens.
+## <a id='M-08'></a>M-08. Too many DSC tokens can get minted for fee-on-transfer tokens
 
 _Submitted by [GoSoul22](/profile/clk7zkyd70002l608iam3ggtg), [Bobface](/profile/clk572bex000wl5082nhslxbq), [Madalad](/profile/clki3uj3i0000l508carwkhuh), [Breeje](/profile/clk41ow6c0066la0889fuw52t), [33audits](/profile/clkh3zf810018mi08yjzuvbu1), [rvierdiiev](/profile/clk48xt1x005yl50815kr7bpc), [Dliteofficial](/profile/clk40ntj2001mmb08zbxnflu4), [toshii](/profile/clkkffr6v0008mm0866fnnu0a), [ADM](/profile/clk4kalbm0008l508td2elpga), [Phantasmagoria](/profile/clki6y71n000gkx088cowa4hq), [P12473](/profile/clk6kv9cw000kld08aoojapp0), [Bauchibred](/profile/clk9ibj6p0002mh08c603lr2j), [t0x1c](/profile/clk7rcevn0004jn08o2n2g1a5), [said017](/profile/clk3uzcop000ilb08pak3rnii), [tsvetanovv](/profile/clk3x0ilz001ol808l9uu6vpj), [ptsanev](/profile/clk41ds6d0056la0868j7rf0l), [ZanyBonzy](/profile/clk9uu45r0000js08lnm9zbez), [alymurtazamemon](/profile/clk3q1mog0000jr082dc9tipk), [RugpullDetector](/profile/clknpmzwp0014l608wk9hflu6), [No12Samurai](/profile/clk7mu64b000cme08wadtt1f6), [golanger85](/profile/clk9gmt880000mj08xc8hw7ng), [Deathstore](/profile/clkglvxbj0006ms089kunsfuw), [Kose](/profile/clk3whc2g0000mg08zp13lp1p), [Tripathi](/profile/clk3xe9tk0024l808xjc9wkg4), [xfu](/profile/clke2oift0000l508j03apihy), [alexzoid](/profile/clk41t0lv006kla08p69ueiel), [Kresh](/profile/clk793io00000mq08mnijuadg), [mau](/profile/clk9v1fgt0008mn08czddr9to), [tsar](/profile/clk9isayj0004l30847ln1e8j), [owade](/profile/clk9j4mf20002mi08k4758eni). Selected submission by: [Bobface](/profile/clk572bex000wl5082nhslxbq)._      
 				
@@ -1955,7 +1955,7 @@ sure that division by 0 scenarios are handled properly.
 
 # Gas Optimizations / Informationals
 
-## <a id='G-01'></a>G-01. using x=x+y /x=x-y  is more gas efficient than x+=y / x-=y
+## <a id='G-01'></a>G-01. using x=x+y /x=x-y is more gas efficient than x+=y / x-=y
 
 _Submitted by [0xSafeGuard](/team/clkhmrygo0001l508vlnyl978), [mahdirostami](/profile/clk52jmr9000el008w4z3a043), [souilos](/profile/clkm7ipa90014l608xim10mt3), [castleChain](/profile/clk48to2u004wla08041jl9ld), [0x0115](/profile/clk4scd7q0000l208rpyf7gvh), [0xNiloy](/profile/clk43a7ek000ojq085f8vxr9v), [Bbash](/profile/clkcphh780004mp083mgcgae1), [Qiezie](/profile/clk3vxv520010kx08lj3sw4ok), [TheSavageTeddy](/profile/clk9nkvfc0000m9080ev2utin), [0xbugalba](/team/clkff1bat0001k4082yo3xy8j), [SAQ](/profile/clkftc56x0006le08usdp7epo), [0xadarsh](/profile/clkvfe7q8000wl408zqbmb7do), [owade](/profile/clk9j4mf20002mi08k4758eni). Selected submission by: [castleChain](/profile/clk48to2u004wla08041jl9ld)._      
 				
@@ -2298,7 +2298,7 @@ index a7a6639..1906a92 100644
  
      function _redeemCollateral(address from, address to, address tokenCollateralAddress, uint256 amountCollateral)
 ```
-## <a id='G-10'></a>G-10. `Ownable` and `ERC20Burneable` implementations arent necesary in `DecentralizedStableCoin`
+## <a id='G-10'></a>G-10. `Ownable` and `ERC20Burneable` implementations arent necessary in `DecentralizedStableCoin`
 
 _Submitted by [LaScaloneta](/team/clkgxjy6h0025lc080s97ux79)._      
 				
@@ -2515,7 +2515,7 @@ Manual review
 
 ## Recommendations
 Add a `if` or `require` check to unsure user is inputting `amountCollateral` <= to his balance.
-## <a id='G-13'></a>G-13. Constants should be be used for hardcoded values
+## <a id='G-13'></a>G-13. Constants should be used for hardcoded values
 
 _Submitted by [akhilmanga](/profile/clk48iw7c0056l508gqk81x6a), [sobieski](/profile/clk7551e0001ol408rl4fyi5s), [0xbug](/profile/clkch5i9j0008jz088olf29x1), [castleChain](/profile/clk48to2u004wla08041jl9ld), [ABA](/profile/clk43rqfo0008mg084q0ema3g), [charlesCheerful](/profile/clk3wmzul0008l808andx29ul), [Bbash](/profile/clkcphh780004mp083mgcgae1), [neocrao](/profile/clkq5kij0000amc083lbapqf7), [Ericselvig](/profile/clk3tbdri000qib08vc8d5xn2), [SolSaver](/profile/clkwer9fs001kjy0849j3go9n). Selected submission by: [ABA](/profile/clk43rqfo0008mg084q0ema3g)._      
 				
@@ -2525,7 +2525,7 @@ https://github.com/Cyfrin/2023-07-foundry-defi-stablecoin/blob/main/src/DSCEngin
 
 ## Description
 
-Constants should be be used for hardcoded values, especially if the [constants already exist](https://github.com/Cyfrin/2023-07-foundry-defi-stablecoin/blob/main/src/DSCEngine.sol#L71), as it is in this case in `DSCEngine`.
+Constants should be used for hardcoded values, especially if the [constants already exist](https://github.com/Cyfrin/2023-07-foundry-defi-stablecoin/blob/main/src/DSCEngine.sol#L71), as it is in this case in `DSCEngine`.
 
 ```Solidity
     uint256 private constant PRECISION = 1e18;
@@ -2850,7 +2850,7 @@ Above can be combined into single mapping
 
 ## Impact
 Gas: Instead of having 2 mappings we can combine into a single mapping of struct for the user addresses data 
-We will make use on a single mapping instead of 2 saving the computation, hashing of mapping storage slots computations  and saving storage costs. Also since we have 2 tokens we can also remove the inner mapping ==> mapping(address token => uint256 amount to add seperate amounts deposited into user struct 
+We will make use on a single mapping instead of 2 saving the computation, hashing of mapping storage slots computations  and saving storage costs. Also since we have 2 tokens we can also remove the inner mapping ==> mapping(address token => uint256 amount to add separate amounts deposited into user struct 
 
 ## Tools Used
 Manual Analysis 
@@ -2963,7 +2963,7 @@ _Submitted by [sobieski](/profile/clk7551e0001ol408rl4fyi5s)._
 
 ## Summary
 
-The `_healthFactor` method of DSCEngine contract is preceeded by the following comment:
+The `_healthFactor` method of DSCEngine contract is preceded by the following comment:
 
 ```solidity
 /*
@@ -3502,7 +3502,7 @@ function depositCollateral(address tokenCollateralAddress, uint256 amountCollate
 function _burnDsc(uint256 amountDscToBurn, address onBehalfOf, address dscFrom) private {
         s_DSCMinted[onBehalfOf] -= amountDscToBurn;
         bool success = i_dsc.transferFrom(dscFrom, address(this), amountDscToBurn);
-        // This conditional is hypothtically unreachable
+        // This conditional is hypothetically unreachable
         if (!success) {
 -            revert DSCEngine__TransferFailed();
 +            revert DSCEngine__TransferFailed(address(i_dsc));
@@ -3591,7 +3591,7 @@ The contract's interface should be imported first, followed by each of the inter
 
 Manual Review
 
-## <a id='G-37'></a>G-37. Unnesessery argument in getTimeout function
+## <a id='G-37'></a>G-37. Unnecessary argument in getTimeout function
 
 _Submitted by [iurii2002](/profile/clkjopcpe0020mb08ev4t85e5), [0xDanielH](/profile/clkkityt00000mj08mr89rdav), [xfu](/profile/clke2oift0000l508j03apihy). Selected submission by: [iurii2002](/profile/clkjopcpe0020mb08ev4t85e5)._      
 				
@@ -3744,7 +3744,7 @@ https://github.com/Cyfrin/foundry-defi-stablecoin-f23/blob/main/src/DSCEngine.so
 Boolean constants can be used directly and do not need to be compared to true or false.
 
 ## Vulnerability Details
-!minted is more concise and readable than minted != true. The !minted expression directly conveys the meaning "if not minted" or "if minted is false," which is much clearer than explicitly comparing minted to true. The latter form, minted != true, adds unnecessary complexity and verbosity to the code.
+`!minted` is more concise and readable than minted != true. The `!minted` expression directly conveys the meaning "if not minted" or "if minted is false," which is much clearer than explicitly comparing minted to true. The latter form, minted != true, adds unnecessary complexity and verbosity to the code.
 
 ## Impact
 Code Readability

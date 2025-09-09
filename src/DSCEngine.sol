@@ -31,6 +31,10 @@ import { ReentrancyGuard } from "@openzeppelin/contracts/security/ReentrancyGuar
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import { DecentralizedStableCoin } from "./DecentralizedStableCoin.sol";
 
+import {IERC20Metadata} from "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
+/// @notice Provides `decimals()` method for ERC20 tokens
+/// @dev Needed to correctly normalize token amounts to 18 decimals when calculating USD value
+
 /*
  * @title DSCEngine
  * @author Patrick Collins
@@ -334,6 +338,13 @@ contract DSCEngine is ReentrancyGuard {
         return _calculateHealthFactor(totalDscMinted, collateralValueInUsd);
     }
 
+  // @notice Calculates the USD value of a given ERC20 token amount
+  /// @dev Uses `IERC20Metadata` to fetch the token's decimals dynamically,
+  ///      ensuring correct conversion for tokens like WBTC (8 decimals) or USDC (6 decimals)
+  /// @param token The ERC20 token address
+  /// @param amount The token amount in its smallest unit (wei for 18 decimals, satoshi-like for others)
+  /// @return usdValueInWei The USD value of the token amount scaled to 1e18 precision
+  /// @notice Through this we can do easy health factor and other internal calulations with a precise 1e18 which before was broken when wbtc was engulfed
     function _getUsdValue(address token, uint256 amount) private view returns (uint256) {
         AggregatorV3Interface priceFeed = AggregatorV3Interface(s_priceFeeds[token]);
         (, int256 price,,,) = priceFeed.staleCheckLatestRoundData();
@@ -341,7 +352,13 @@ contract DSCEngine is ReentrancyGuard {
         // The returned value from Chainlink will be 1000 * 1e8
         // Most USD pairs have 8 decimals, so we will just pretend they all do
         // We want to have everything in terms of WEI, so we add 10 zeros at the end
-        return ((uint256(price) * ADDITIONAL_FEED_PRECISION) * amount) / PRECISION;
+        //Using the IERC20Metadata to get the decimals, as weth is 1e18 where as , wbtc is 1e8
+        uint8 tokenDecimals = IERC20Metadata(token).decimals();
+        // Convert token amount to 18 decimals for internal calculation
+        uint256 adjustedAmount = amount * (10 ** (18 - tokenDecimals));
+        usdValueInWei = (uint256(price) * adjustedAmount * ADDITIONAL_FEED_PRECISION) / PRECISION;
+        //return ((uint256(price) * ADDITIONAL_FEED_PRECISION) * amount) / PRECISION;
+        return usdValueInWei;
     }
 
     function _calculateHealthFactor(

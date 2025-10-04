@@ -123,12 +123,8 @@ contract DSCEngineTest is StdCheats, Test {
     }
 
     function testRevertsIfCollateralZero() public {
-        vm.startPrank(user);
-        ERC20Mock(weth).approve(address(dsce), amountCollateral);
-
         vm.expectRevert(DSCEngine.DSCEngine__NeedsMoreThanZero.selector);
         dsce.depositCollateral(weth, 0);
-        vm.stopPrank();
     }
 
     function testRevertsWithUnapprovedCollateral() public {

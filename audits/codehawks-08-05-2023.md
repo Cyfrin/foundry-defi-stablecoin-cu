@@ -1494,7 +1494,7 @@ This blocking mechanism operates by frontrunning the liquidator and triggering t
 
 ```solidity
 function _burnDsc(uint256 amountDscToBurn, address onBehalfOf, address dscFrom) private {
-    s_DSCMinted[onBehalfOf] -= amountDscToBurn; //Undeflow will happen here
+    s_DSCMinted[onBehalfOf] -= amountDscToBurn; //Underflow will happen here
     bool success = i_dsc.transferFrom(dscFrom, address(this), amountDscToBurn);
     if (!success) {
         revert DSCEngine__TransferFailed();
@@ -1508,7 +1508,7 @@ The exact values of DSC that the attacker has to burn to block the liquidation a
 Consider the example scenario below. Alice has minted $5500 worth of DSC, however her ETH deposited as collateral is worth $10000, therefore below the minimum 200% collateralization.
 1. Bob (the liquidator) sees Alice's position and decide to liquidate her full DSC position to restore the protocol health (by calling `liquidate(address(WETH), address(alice), 5500000000000000000000)`
 2. Alice see Bob's transaction on the mempool and tries to frontrunning it by calling ``liquidate(address(WETH), address(alice), 2000)`` using her secondary address.
-Consider that Alice is sucessfull in frontrunning Bob, therefore after Alice's tx, `s_DSCMinted[address(Alice)]` will be 5499999999999999998000.
+Consider that Alice is successful in frontrunning Bob, therefore after Alice's tx, `s_DSCMinted[address(Alice)]` will be 5499999999999999998000.
 3. Now during Bob's transaction execution, `liquidate` will try to burn `5500000000000000000000` DSC tokens from Alice, but her `s_DSCMinted[address(Alice)]` is `5499999999999999998000`, causing the call to revert due to arithmetic underflow.
 
 See POC below for example:
@@ -1718,7 +1718,7 @@ In the current implementation the token and price feed addresses aren’t checke
 When deploy the `DSCEngine.sol`, if pass token with address(0) and working price feed address, the deployment will be successful, but the user experience is going to fall when using the protocol, due to EVM Revert.
 
 ```solidity
-// Deploying the protocol localy with token address(0)
+// Deploying the protocol locally with token address(0)
 
 return NetworkConfig({
         wethUsdPriceFeed: address(ethUsdPriceFeed),
@@ -2803,7 +2803,7 @@ https://github.com/Cyfrin/2023-07-foundry-defi-stablecoin/blob/d1c5501aa79320ca0
 Custom errors need to be descriptive and follow consistent format in code. This is not the case with the errors in all contracts in scope 
 
 ## Vulnerability Details
-As dicussed in other finding on Custom Error ambiguity. It is necessary for Custom Errors to be clear about what they specify, mean, are enforcing, checking, requiring or preventing etc. Naming can be more aligned across the Custom Errors used in the contracts. The naming is not consistent and can be improved for clarity
+As discussed in other finding on Custom Error ambiguity. It is necessary for Custom Errors to be clear about what they specify, mean, are enforcing, checking, requiring or preventing etc. Naming can be more aligned across the Custom Errors used in the contracts. The naming is not consistent and can be improved for clarity
 
 ## Impact
 Informational: This can lead to confusion for debugging, offchain monitoring, tooling,error analysis and maintainability of code. If Custom Error is not clear it may be misinterpreted incorrectly and may even lead to more errors in code as developers make wrong assumptions about the errors intentions. 
@@ -3353,7 +3353,7 @@ The `redeemCollateral` function does not directly require the user to burn DSC t
 PoC: Add this test to `DSCEngineTest.t.sol` and it passes 
 ```
     function testCanRedeemCollateralWithSomeDSCMintedAndNotBurnDSC() public {
-        //user deposits a large amout of weth and mints a small amount of dsc
+        //user deposits a large amount of weth and mints a small amount of dsc
         vm.startPrank(user);
         ERC20Mock(weth).approve(address(dsce), 1000);
         dsce.depositCollateralAndMintDsc(weth, 1000, 1);

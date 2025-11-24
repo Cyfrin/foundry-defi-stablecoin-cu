@@ -242,6 +242,19 @@ contract DSCEngineTest is StdCheats, Test {
         assertEq(userBalance, amountToMint);
     }
 
+    function testCannotMintWithoutDepositingCollateral() public {
+    vm.startPrank(USER);
+
+    // Do NOT deposit collateral; do NOT approve anything.
+    // Try to mint — should revert because health factor will be broken.
+    vm.expectRevert(
+        abi.encodeWithSelector(DSCEngine.DSCEngine__BreakHealthFactor.selector)
+    );
+    dsce.mintDsc(AMOUNT_MINT);
+
+    vm.stopPrank();
+    }
+
     ///////////////////////////////////
     // burnDsc Tests //
     ///////////////////////////////////

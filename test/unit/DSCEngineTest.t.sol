@@ -353,6 +353,7 @@ contract DSCEngineTest is StdCheats, Test {
     function testCanRedeemDepositedCollateral() public {
         vm.startPrank(user);
         ERC20Mock(weth).approve(address(dsce), amountCollateral);
+        dsc.approve(address(dsce), amountToMint);
         dsce.depositCollateralAndMintDsc(weth, amountCollateral, amountToMint);
         dsc.approve(address(dsce), amountToMint);
         dsce.redeemCollateralForDsc(weth, amountCollateral, amountToMint);

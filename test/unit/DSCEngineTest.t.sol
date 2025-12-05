@@ -24,6 +24,9 @@ contract DSCEngineTest is StdCheats, Test {
     DecentralizedStableCoin public dsc;
     HelperConfig public helperConfig;
 
+    uint256 public beforeLiquidatorBalance;
+    uint256 public afterLiquidatorBalance;
+
     address public ethUsdPriceFeed;
     address public btcUsdPriceFeed;
     address public weth;
@@ -455,8 +458,10 @@ contract DSCEngineTest is StdCheats, Test {
         ERC20Mock(weth).approve(address(dsce), collateralToCover);
         dsce.depositCollateralAndMintDsc(weth, collateralToCover, amountToMint);
         dsc.approve(address(dsce), amountToMint);
+        beforeLiquidatorBalance = dsc.balanceOf(liquidator);
         dsce.liquidate(weth, user, amountToMint); // We are covering their whole debt
         vm.stopPrank();
+        beforeLiquidatorBalance = dsc.balanceOf(liquidator);
         _;
     }
 
@@ -484,8 +489,8 @@ contract DSCEngineTest is StdCheats, Test {
     }
 
     function testLiquidatorTakesOnUsersDebt() public liquidated {
-        (uint256 liquidatorDscMinted,) = dsce.getAccountInformation(liquidator);
-        assertEq(liquidatorDscMinted, amountToMint);
+        uint256 expectedDebtRduced = amountToMint;
+        assertEq(beforeLiquidatorBalance-afterLiquidatorBalance, expectedDebtRduced);
     }
 
     function testUserHasNoMoreDebt() public liquidated {

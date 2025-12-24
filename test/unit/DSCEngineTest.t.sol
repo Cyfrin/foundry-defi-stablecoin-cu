@@ -247,8 +247,11 @@ contract DSCEngineTest is StdCheats, Test {
 
     // Do NOT deposit collateral; do NOT approve anything.
     // Try to mint — should revert because health factor will be broken.
+
+    // Expected health factor should be zero since no collateral was deposited
+    uint256 expectedHealthFactor = 0;
     vm.expectRevert(
-        abi.encodeWithSelector(DSCEngine.DSCEngine__BreakHealthFactor.selector)
+        abi.encodeWithSelector(DSCEngine.DSCEngine__BreaksHealthFactor.selector, expectedHealthFactor)
     );
     dsce.mintDsc(amountToMint);
 

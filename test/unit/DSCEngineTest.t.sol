@@ -18,7 +18,7 @@ import { StdCheats } from "forge-std/StdCheats.sol";
 
 contract DSCEngineTest is StdCheats, Test {
     event CollateralRedeemed(address indexed redeemFrom, address indexed redeemTo, address token, uint256 amount); // if
-        // redeemFrom != redeemedTo, then it was liquidated
+    // redeemFrom != redeemedTo, then it was liquidated
 
     DSCEngine public dsce;
     DecentralizedStableCoin public dsc;
@@ -243,16 +243,16 @@ contract DSCEngineTest is StdCheats, Test {
     }
 
     function testCannotMintWithoutDepositingCollateral() public {
-    vm.startPrank(user);
+        vm.startPrank(user);
 
-    // Do NOT deposit collateral; do NOT approve anything.
-    // Try to mint — should revert because health factor will be broken.
-    vm.expectRevert(
-        abi.encodeWithSelector(DSCEngine.DSCEngine__BreakHealthFactor.selector)
-    );
-    dsce.mintDsc(amountToMint);
+        // Do NOT deposit collateral; do NOT approve anything.
+        // Try to mint — should revert because health factor will be broken.
+        // With 0 collateral, the health factor will be 0
+        uint256 expectedHealthFactor = dsce.calculateHealthFactor(amountToMint, 0);
+        vm.expectRevert(abi.encodeWithSelector(DSCEngine.DSCEngine__BreaksHealthFactor.selector, expectedHealthFactor));
+        dsce.mintDsc(amountToMint);
 
-    vm.stopPrank();
+        vm.stopPrank();
     }
 
     ///////////////////////////////////
@@ -463,7 +463,9 @@ contract DSCEngineTest is StdCheats, Test {
     function testLiquidationPayoutIsCorrect() public liquidated {
         uint256 liquidatorWethBalance = ERC20Mock(weth).balanceOf(liquidator);
         uint256 expectedWeth = dsce.getTokenAmountFromUsd(weth, amountToMint)
-            + (dsce.getTokenAmountFromUsd(weth, amountToMint) * dsce.getLiquidationBonus() / dsce.getLiquidationPrecision());
+            + (dsce.getTokenAmountFromUsd(weth, amountToMint)
+                * dsce.getLiquidationBonus()
+                / dsce.getLiquidationPrecision());
         uint256 hardCodedExpected = 6_111_111_111_111_111_110;
         assertEq(liquidatorWethBalance, hardCodedExpected);
         assertEq(liquidatorWethBalance, expectedWeth);
@@ -472,7 +474,9 @@ contract DSCEngineTest is StdCheats, Test {
     function testUserStillHasSomeEthAfterLiquidation() public liquidated {
         // Get how much WETH the user lost
         uint256 amountLiquidated = dsce.getTokenAmountFromUsd(weth, amountToMint)
-            + (dsce.getTokenAmountFromUsd(weth, amountToMint) * dsce.getLiquidationBonus() / dsce.getLiquidationPrecision());
+            + (dsce.getTokenAmountFromUsd(weth, amountToMint)
+                * dsce.getLiquidationBonus()
+                / dsce.getLiquidationPrecision());
 
         uint256 usdAmountLiquidated = dsce.getUsdValue(weth, amountLiquidated);
         uint256 expectedUserCollateralValueInUsd = dsce.getUsdValue(weth, amountCollateral) - (usdAmountLiquidated);

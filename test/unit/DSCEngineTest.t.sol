@@ -292,25 +292,32 @@ contract DSCEngineTest is StdCheats, Test {
     function testRevertsIfTransferFails() public {
         // Arrange - Setup
         address owner = msg.sender;
-        vm.prank(owner);
+        vm.startPrank(owner);
         MockFailedTransfer mockDsc = new MockFailedTransfer();
-        tokenAddresses = [address(mockDsc)];
-        feedAddresses = [ethUsdPriceFeed];
-        vm.prank(owner);
-        DSCEngine mockDsce = new DSCEngine(tokenAddresses, feedAddresses, address(mockDsc));
-        mockDsc.mint(user, amountCollateral);
+    
+        address[] memory tokens = new address[](1);
+        tokens[0] = address(mockDsc);
+        address[] memory feeds = new address[](1);
+        feeds[0] = ethUsdPriceFeed;
 
-        vm.prank(owner);
+        DSCEngine mockDsce = new DSCEngine(tokens, feeds, address(mockDsc));
+
+        mockDsc.mint(user, amountCollateral);
         mockDsc.transferOwnership(address(mockDsce));
+        vm.stopPrank(); 
+
         // Arrange - User
         vm.startPrank(user);
         ERC20Mock(address(mockDsc)).approve(address(mockDsce), amountCollateral);
+
         // Act / Assert
         mockDsce.depositCollateral(address(mockDsc), amountCollateral);
+
         vm.expectRevert(DSCEngine.DSCEngine__TransferFailed.selector);
         mockDsce.redeemCollateral(address(mockDsc), amountCollateral);
         vm.stopPrank();
     }
+
 
     function testRevertsIfRedeemAmountIsZero() public {
         vm.startPrank(user);

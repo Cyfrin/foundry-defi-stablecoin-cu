@@ -62,7 +62,6 @@ contract DSCEngine is ReentrancyGuard {
     error DSCEngine__MintFailed();
     error DSCEngine__HealthFactorOk();
     error DSCEngine__HealthFactorNotImproved();
-    error DSCEngine__InvalidPrice();
 
     ///////////////////
     // Types
@@ -96,7 +95,7 @@ contract DSCEngine is ReentrancyGuard {
     ///////////////////
     event CollateralDeposited(address indexed user, address indexed token, uint256 indexed amount);
     event CollateralRedeemed(address indexed redeemFrom, address indexed redeemTo, address token, uint256 amount); // if
-        // redeemFrom != redeemedTo, then it was liquidated
+    // redeemFrom != redeemedTo, then it was liquidated
 
     ///////////////////
     // Modifiers
@@ -339,18 +338,10 @@ contract DSCEngine is ReentrancyGuard {
         AggregatorV3Interface priceFeed = AggregatorV3Interface(s_priceFeeds[token]);
         (, int256 price,,,) = priceFeed.staleCheckLatestRoundData();
 
-        if (price <= 0) {
-            revert DSCEngine__InvalidPrice();
-        }
-
-        // casting to uint256 is safe because price > 0 is checked above
+        // casting to uint256 is safe because supported Chainlink price feeds are expected to return positive prices
         // forge-lint: disable-next-line(unsafe-typecast)
         uint256 priceUint256 = uint256(price);
 
-        // 1 ETH = 1000 USD
-        // The returned value from Chainlink will be 1000 * 1e8
-        // Most USD pairs have 8 decimals, so we will just pretend they all do
-        // We want to have everything in terms of WEI, so we add 10 zeros at the end
         return ((priceUint256 * ADDITIONAL_FEED_PRECISION) * amount) / PRECISION;
     }
 
@@ -425,11 +416,12 @@ contract DSCEngine is ReentrancyGuard {
     function getTokenAmountFromUsd(address token, uint256 usdAmountInWei) public view returns (uint256) {
         AggregatorV3Interface priceFeed = AggregatorV3Interface(s_priceFeeds[token]);
         (, int256 price,,,) = priceFeed.staleCheckLatestRoundData();
-        // $100e18 USD Debt
-        // 1 ETH = 2000 USD
-        // The returned value from Chainlink will be 2000 * 1e8
-        // Most USD pairs have 8 decimals, so we will just pretend they all do
-        return ((usdAmountInWei * PRECISION) / (uint256(price) * ADDITIONAL_FEED_PRECISION));
+
+        // casting to uint256 is safe because supported Chainlink price feeds are expected to return positive prices
+        // forge-lint: disable-next-line(unsafe-typecast)
+        uint256 priceUint256 = uint256(price);
+
+        return ((usdAmountInWei * PRECISION) / (priceUint256 * ADDITIONAL_FEED_PRECISION));
     }
 
     function getPrecision() external pure returns (uint256) {

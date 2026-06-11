@@ -81,8 +81,13 @@ contract ContinueOnRevertHandler is Test {
     /////////////////////////////
     function transferDsc(uint256 amountDsc, address to) public {
         amountDsc = bound(amountDsc, 0, dsc.balanceOf(msg.sender));
+
         vm.prank(msg.sender);
-        dsc.transfer(to, amountDsc);
+        bool success = dsc.transfer(to, amountDsc);
+
+        if (!success) {
+            return;
+        }
     }
 
     /////////////////////////////

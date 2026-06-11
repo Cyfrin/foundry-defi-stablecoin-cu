@@ -62,6 +62,7 @@ contract DSCEngine is ReentrancyGuard {
     error DSCEngine__MintFailed();
     error DSCEngine__HealthFactorOk();
     error DSCEngine__HealthFactorNotImproved();
+    error DSCEngine__InvalidPrice();
 
     ///////////////////
     // Types
@@ -337,11 +338,20 @@ contract DSCEngine is ReentrancyGuard {
     function _getUsdValue(address token, uint256 amount) private view returns (uint256) {
         AggregatorV3Interface priceFeed = AggregatorV3Interface(s_priceFeeds[token]);
         (, int256 price,,,) = priceFeed.staleCheckLatestRoundData();
+
+        if (price <= 0) {
+            revert DSCEngine__InvalidPrice();
+        }
+
+        // casting to uint256 is safe because price > 0 is checked above
+        // forge-lint: disable-next-line(unsafe-typecast)
+        uint256 priceUint256 = uint256(price);
+
         // 1 ETH = 1000 USD
         // The returned value from Chainlink will be 1000 * 1e8
         // Most USD pairs have 8 decimals, so we will just pretend they all do
         // We want to have everything in terms of WEI, so we add 10 zeros at the end
-        return ((uint256(price) * ADDITIONAL_FEED_PRECISION) * amount) / PRECISION;
+        return ((priceUint256 * ADDITIONAL_FEED_PRECISION) * amount) / PRECISION;
     }
 
     function _calculateHealthFactor(

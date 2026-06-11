@@ -165,12 +165,21 @@ contract DSCEngineTest is StdCheats, Test {
 
     function testRevertsIfMintedDscBreaksHealthFactor() public {
         (, int256 price,,,) = MockV3Aggregator(ethUsdPriceFeed).latestRoundData();
-        amountToMint = (amountCollateral * (uint256(price) * dsce.getAdditionalFeedPrecision())) / dsce.getPrecision();
+
+        assert(price > 0);
+
+        // casting to uint256 is safe because price > 0 is checked above
+        // forge-lint: disable-next-line(unsafe-typecast)
+        uint256 priceUint256 = uint256(price);
+
+        amountToMint = (amountCollateral * (priceUint256 * dsce.getAdditionalFeedPrecision())) / dsce.getPrecision();
+
         vm.startPrank(user);
         ERC20Mock(weth).approve(address(dsce), amountCollateral);
 
         uint256 expectedHealthFactor =
             dsce.calculateHealthFactor(amountToMint, dsce.getUsdValue(weth, amountCollateral));
+
         vm.expectRevert(abi.encodeWithSelector(DSCEngine.DSCEngine__BreaksHealthFactor.selector, expectedHealthFactor));
         dsce.depositCollateralAndMintDsc(weth, amountCollateral, amountToMint);
         vm.stopPrank();
@@ -221,15 +230,23 @@ contract DSCEngineTest is StdCheats, Test {
     }
 
     function testRevertsIfMintAmountBreaksHealthFactor() public depositedCollateral {
-        // 0xe580cc6100000000000000000000000000000000000000000000000006f05b59d3b20000
-        // 0xe580cc6100000000000000000000000000000000000000000000003635c9adc5dea00000
         (, int256 price,,,) = MockV3Aggregator(ethUsdPriceFeed).latestRoundData();
-        amountToMint = (amountCollateral * (uint256(price) * dsce.getAdditionalFeedPrecision())) / dsce.getPrecision();
+
+        assert(price > 0);
+
+        // casting to uint256 is safe because price > 0 is checked above
+        // forge-lint: disable-next-line(unsafe-typecast)
+        uint256 priceUint256 = uint256(price);
+
+        amountToMint = (amountCollateral * (priceUint256 * dsce.getAdditionalFeedPrecision())) / dsce.getPrecision();
 
         vm.startPrank(user);
+
         uint256 expectedHealthFactor =
             dsce.calculateHealthFactor(amountToMint, dsce.getUsdValue(weth, amountCollateral));
+
         vm.expectRevert(abi.encodeWithSelector(DSCEngine.DSCEngine__BreaksHealthFactor.selector, expectedHealthFactor));
+
         dsce.mintDsc(amountToMint);
         vm.stopPrank();
     }

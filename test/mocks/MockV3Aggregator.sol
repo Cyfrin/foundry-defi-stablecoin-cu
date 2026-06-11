@@ -65,7 +65,6 @@ contract MockV3Aggregator {
             getAnswer[latestRound],
             getStartedAt[latestRound],
             getTimestamp[latestRound],
-
             // casting to uint80 is safe because latestRound is incremented sequentially
             // in tests and can never realistically exceed uint80 max value
             // forge-lint: disable-next-line(unsafe-typecast)
